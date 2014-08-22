@@ -53,6 +53,9 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
 /* comments */
 COMMENT  \/\*(.|\n)*\*\/|\/\/.*\n
 
+/* invalid characters */
+INVALID  [^ \t\n\r\f\v]
+
 %%
 
 {int}       {
@@ -141,6 +144,10 @@ COMMENT  \/\*(.|\n)*\*\/|\/\/.*\n
 
 {COMMENT}   {
                printf("***%s***", yytext);
+}
+
+{INVALID}   {
+               printf("!!!%s!!!", yytext);
 }
 
 %%
