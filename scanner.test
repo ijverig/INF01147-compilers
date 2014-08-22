@@ -64,6 +64,11 @@ well */
    // too
  */
 
+/* a
+   /* nested */
+   comment
+ */
+
 this should not, however
 
 int
@@ -96,6 +101,7 @@ true
 ""
 "hehehe"
 
+  tab		
 ''
 'wr'
 ^
