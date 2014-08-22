@@ -20,11 +20,11 @@ ALNUM    [{ALPHA}0-9]
 WORD     {ALNUM}*
 
 /* reserved words */
-int      int
-float    float
-bool     bool
-char     char
-string   string
+INT      int
+FLOAT    float
+BOOL     bool
+CHAR     char
+STRING   string
 IF       if
 THEN     then
 ELSE     else
@@ -41,11 +41,11 @@ SPECIAL  ,|;|:|\(|\)|\[|\]|\{|\}|\+|-|\*|\/|<|>|=|!|&|\$
 COMPOUND <=|>=|==|!=|&&|\|\|
 
 /* literals */
-INT      -?{DIGIT}+
-FLOAT    -?{DIGIT}+\.{DIGIT}+
-BOOL     true|false
-CHAR     '.'
-STRING   \".*\"
+L_INT    -?{DIGIT}+
+L_FLOAT  -?{DIGIT}+\.{DIGIT}+
+L_BOOL   true|false
+L_CHAR   '.'
+L_STRING \".*\"
 
 /* identifiers */
 ID       [a-zA-Z_][a-zA-Z_0-9]*
@@ -58,23 +58,23 @@ INVALID  [^ \t\n\r\f\v]
 
 %%
 
-{int}       {
+{INT}       {
                printf("&&&%s&&&", yytext);
 }
 
-{float}     {
+{FLOAT}     {
                printf("&&&%s&&&", yytext);
 }
 
-{bool}      {
+{BOOL}      {
                printf("&&&%s&&&", yytext);
 }
 
-{char}      {
+{CHAR}      {
                printf("&&&%s&&&", yytext);
 }
 
-{string}    {
+{STRING}    {
                printf("&&&%s&&&", yytext);
 }
 
@@ -118,23 +118,23 @@ INVALID  [^ \t\n\r\f\v]
                printf("^^^%s^^^", yytext);
 }
 
-{INT}       {
+{L_INT}       {
                printf("###%s###", yytext);
 }
 
-{FLOAT}     {
+{L_FLOAT}     {
                printf("###%s###", yytext);
 }
 
-{BOOL}      {
+{L_BOOL}      {
                printf("###%s###", yytext);
 }
 
-{CHAR}      {
+{L_CHAR}      {
                printf("###%s###", yytext);
 }
 
-{STRING}    {
+{L_STRING}    {
                printf("###%s###", yytext);
 }
 
