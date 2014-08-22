@@ -1,0 +1,101 @@
+a: int;
+v: int [10];
+
+main: int ()
+  i: int;
+  {
+  output "Digite um numero: ";
+  input a;
+  while (i<10)
+    {
+    a = incn(a,1);
+    i = i + 1;
+    };
+  output "Incrementado algumas vezes fica ",a,"\n"
+  };
+
+incn: int (x:int, n:int)
+  { return x+n; };
+  
+outra: int () {};
+
+maisuma: int ()
+  {
+  };
+
+int resposta = 42;
+float _x2 = -666;
+float PI = 3.141519;
+
+_45
+
+555
+
+Pedro
+
+1 < 3
+
+ab >= x - 7
+
+if (x) then y else z
+
+true || false
+
+do return input < output while true
+
+();
+
+( ) ;
+
+[ ]
+
+, ; : ( ) [ ] { } +- * / < > = ! & $
+
+// This is a comment
+
+/* This
+should
+be
+ignored
+as
+well */
+
+/* This
+   // too
+ */
+
+this should not, however
+
+int
+float
+bool
+char
+if
+then
+else
+while
+do
+input
+return
+output
+
+<=
+>=
+==
+!=
+&&
+||
+
+abc_id
+123
+1.23
+false
+true
+"a"
+'a'
+""
+"hehehe"
+
+''
+'wr'
+^
