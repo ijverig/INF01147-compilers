@@ -7,6 +7,8 @@
  *
  */
 
+%option yylineno
+
 %{
 
 #include "parser.h"
@@ -141,7 +143,7 @@ INVALID  [^ \t\n\r\f\v]
 }
 
 {COMMENT}   {
-               printf("***%s***", yytext);
+               
 }
 
    /* multi-line comment rule from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
@@ -150,9 +152,9 @@ INVALID  [^ \t\n\r\f\v]
 }
 <IN_COMMENT>{
    \*\/        BEGIN(INITIAL);
-   [^*\n]+     // eat comment in chunks
-   \*          // eat the lone star
-   \n          // eat line break
+   [^*\n]+     
+   \*          
+   \n          
 }
 
 {ID}        {
@@ -161,6 +163,10 @@ INVALID  [^ \t\n\r\f\v]
 
 {INVALID}   {
                printf("!!!%s!!!", yytext);
+}
+
+\n          {
+               
 }
 
 %%
