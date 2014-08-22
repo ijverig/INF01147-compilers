@@ -13,6 +13,8 @@
 
 %}
 
+%s IN_COMMENT
+
 /* auxiliar */
 DIGIT    [0-9]
 ALPHA    [a-zA-Z]
@@ -47,11 +49,11 @@ L_BOOL   true|false
 L_CHAR   '.'
 L_STRING \".*\"
 
+/* comments */
+COMMENT  \/\/.*\n
+
 /* identifiers */
 ID       [a-zA-Z_][a-zA-Z_0-9]*
-
-/* comments */
-COMMENT  \/\*(.|\n)*\*\/|\/\/.*\n
 
 /* invalid characters */
 INVALID  [^ \t\n\r\f\v]
@@ -138,12 +140,23 @@ INVALID  [^ \t\n\r\f\v]
                printf("###%s###", yytext);
 }
 
-{ID}        {
-               printf("@@@%s@@@", yytext);
-}
-
 {COMMENT}   {
                printf("***%s***", yytext);
+}
+
+   /* multi-line comment rule from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
+<INITIAL>{
+   \/\*        BEGIN(IN_COMMENT);
+}
+<IN_COMMENT>{
+   \*\/        BEGIN(INITIAL);
+   [^*\n]+     // eat comment in chunks
+   \*          // eat the lone star
+   \n          // eat line break
+}
+
+{ID}        {
+               printf("@@@%s@@@", yytext);
 }
 
 {INVALID}   {
