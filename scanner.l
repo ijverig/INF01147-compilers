@@ -47,7 +47,8 @@ COMPOUND <=|>=|==|!=|&&|\|\|
 /* literals */
 L_INT    -?{DIGIT}+
 L_FLOAT  -?{DIGIT}+\.{DIGIT}+
-L_BOOL   true|false
+L_TRUE   true
+L_FALSE  false
 L_CHAR   '.'
 L_STRING \".*\"
 
@@ -63,83 +64,107 @@ INVALID  [^ \t\n\r\f\v]
 %%
 
 {INT}       {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_INT;
 }
 
 {FLOAT}     {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_FLOAT;
 }
 
 {BOOL}      {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_BOOL;
 }
 
 {CHAR}      {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_CHAR;
 }
 
 {STRING}    {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_STRING;
 }
 
 {IF}        {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_IF;
 }
 
 {THEN}      {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_THEN;
 }
 
 {ELSE}      {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_ELSE;
 }
 
 {WHILE}     {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_WHILE;
 }
 
 {DO}        {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_DO;
 }
 
 {INPUT}     {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_INPUT;
 }
 
 {OUTPUT}    {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_OUTPUT;
 }
 
 {RETURN}    {
-               printf("&&&%s&&&", yytext);
+               return TK_PR_RETURN;
 }
 
 {SPECIAL}   {
-               printf("---%s---", yytext);
+               return yytext[0];
 }
 
-{COMPOUND}  {
-               printf("^^^%s^^^", yytext);
+"<="        {
+               return TK_OC_LE;
 }
 
-{L_INT}       {
-               printf("###%s###", yytext);
+">="        {
+               return TK_OC_GE;
 }
 
-{L_FLOAT}     {
-               printf("###%s###", yytext);
+"=="        {
+               return TK_OC_EQ;
 }
 
-{L_BOOL}      {
-               printf("###%s###", yytext);
+"!="        {
+               return TK_OC_NE;
 }
 
-{L_CHAR}      {
-               printf("###%s###", yytext);
+"&&"        {
+               return TK_OC_AND;
 }
 
-{L_STRING}    {
-               printf("###%s###", yytext);
+"||"        {
+               return TK_OC_OR;
+}
+
+{L_INT}     {
+               return TK_LIT_INT;
+}
+
+{L_FLOAT}   {
+               return TK_LIT_FLOAT;
+}
+
+{L_TRUE}    {
+               return TK_LIT_TRUE;
+}
+
+{L_FALSE}   {
+               return TK_LIT_FALSE;
+}
+
+{L_CHAR}    {
+               return TK_LIT_CHAR;
+}
+
+{L_STRING}  {
+               return TK_LIT_STRING;
 }
 
 {COMMENT}   {
@@ -158,14 +183,18 @@ INVALID  [^ \t\n\r\f\v]
 }
 
 {ID}        {
-               printf("@@@%s@@@", yytext);
+               return TK_IDENTIFICADOR;
 }
 
 {INVALID}   {
-               printf("!!!%s!!!", yytext);
+               return TOKEN_ERRO;
 }
 
 \n          {
+               
+}
+
+.           {
                
 }
 
