@@ -23,6 +23,9 @@ ALPHA    [a-zA-Z]
 ALNUM    [{ALPHA}0-9]
 WORD     {ALNUM}*
 
+/* comments */
+COMMENT  \/\/.*\n
+
 /* reserved words */
 INT      int
 FLOAT    float
@@ -50,10 +53,7 @@ L_FLOAT  -?{DIGIT}+\.{DIGIT}+
 L_TRUE   true
 L_FALSE  false
 L_CHAR   '.'
-L_STRING \".*\"
-
-/* comments */
-COMMENT  \/\/.*\n
+L_STRING \"[^"]*\"
 
 /* identifiers */
 ID       [a-zA-Z_][a-zA-Z_0-9]*
@@ -62,6 +62,21 @@ ID       [a-zA-Z_][a-zA-Z_0-9]*
 INVALID  [^ \t\n\r\f\v]
 
 %%
+
+{COMMENT}   {
+               
+}
+
+   /* multi-line comment rule from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
+<INITIAL>{
+   \/\*        BEGIN(IN_COMMENT);
+}
+<IN_COMMENT>{
+   \*\/        BEGIN(INITIAL);
+   [^*\n]+     
+   \*          
+   \n          
+}
 
 {INT}       {
                return TK_PR_INT;
@@ -165,21 +180,6 @@ INVALID  [^ \t\n\r\f\v]
 
 {L_STRING}  {
                return TK_LIT_STRING;
-}
-
-{COMMENT}   {
-               
-}
-
-   /* multi-line comment rule from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
-<INITIAL>{
-   \/\*        BEGIN(IN_COMMENT);
-}
-<IN_COMMENT>{
-   \*\/        BEGIN(INITIAL);
-   [^*\n]+     
-   \*          
-   \n          
 }
 
 {ID}        {
