@@ -110,22 +110,24 @@ int main (int argc, char **argv)
     }
   }
   USER_INIT;
+  int r;
 #ifdef AVALIACAO_ETAPA_1
-  return main_avaliacao_etapa_1 (argc, argv);
+  r = main_avaliacao_etapa_1 (argc, argv);
 #elif AVALIACAO_ETAPA_2
-  return main_avaliacao_etapa_2 (argc, argv);
+  r = main_avaliacao_etapa_2 (argc, argv);
 #elif AVALIACAO_ETAPA_3
-  return main_avaliacao_etapa_3 (argc, argv);
+  r = main_avaliacao_etapa_3 (argc, argv);
 #elif AVALIACAO_ETAPA_4
-  return main_avaliacao_etapa_4 (argc, argv);
+  r = main_avaliacao_etapa_4 (argc, argv);
 #elif AVALIACAO_ETAPA_5
-  return main_avaliacao_etapa_5 (argc, argv);
+  r = main_avaliacao_etapa_5 (argc, argv);
 #elif AVALIACAO_ETAPA_6
-  return main_avaliacao_etapa_6 (argc, argv);
+  r = main_avaliacao_etapa_6 (argc, argv);
 #elif AVALIACAO_ETAPA_7
-  return main_avaliacao_etapa_7 (argc, argv);
+  r = main_avaliacao_etapa_7 (argc, argv);
 #else
-  return 0;
+  r = 0;
 #endif
   USER_FINALIZE;
+  return r;
 }
