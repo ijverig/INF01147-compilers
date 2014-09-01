@@ -99,9 +99,18 @@ true
 "a"
 'a'
 ""
-"hehehe"
+
+"multi-line
+string"
+
+"st@ ! && * ||ring"
+
+"hehehe" hahaha"
+
+s
 
   tab		
 ''
 'wr'
 ^
+'not a char'

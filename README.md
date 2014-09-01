@@ -1,16 +1,13 @@
 INF01147 - Compiladores
 =======================
 
-Authors
--------
-* Daniel Schmidt
-* Matheus Cardoso
+Stuff from my compilers class at UFRGS.
 
-Steps for building the project
+Steps for building and running the project
 ------------------------------
 ```
 mkdir build
 cd build
 cmake ..
-make
+make && echo "" && ./main < ../scanner.test
 ```
