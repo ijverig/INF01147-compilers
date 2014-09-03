@@ -76,8 +76,10 @@ return            return TK_PR_RETURN;
 {L_FLOAT}         {add_or_update_symbol_line(yytext, yylineno); return TK_LIT_FLOAT;}
 true              {add_or_update_symbol_line(yytext, yylineno); return TK_LIT_TRUE;}
 false             {add_or_update_symbol_line(yytext, yylineno); return TK_LIT_FALSE;}
-{L_CHAR}          {add_or_update_symbol_line(yytext, yylineno); return TK_LIT_CHAR;}
-{L_STRING}        {add_or_update_symbol_line(yytext, yylineno); return TK_LIT_STRING;}
+{L_CHAR}          {yytext[0] = yytext[1]; yytext[1] = '\0'; add_or_update_symbol_line(yytext, yylineno);
+                   yytext[1] = yytext[0]; yytext[0] = '\''; return TK_LIT_CHAR;}
+{L_STRING}        {int len = strlen(yytext); ++yytext; yytext[len - 2] = '\0'; add_or_update_symbol_line(yytext, yylineno);
+                   yytext[len - 2] = '"'; --yytext; return TK_LIT_STRING;}
 
    /* identifiers */
 {ID}              {add_or_update_symbol_line(yytext, yylineno); return TK_IDENTIFICADOR;}
