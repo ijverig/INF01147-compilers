@@ -14,10 +14,9 @@ void yyerror (char const *mensagem)
 
 void main_init (int argc, char **argv)
 {
-  //implemente esta função com rotinas de inicialização, se necessário
 }
 
 void main_finalize (void)
 {
-  //implemente esta função com rotinas de inicialização, se necessário
+	// dict_print();
 }
