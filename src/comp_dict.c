@@ -10,7 +10,17 @@ unsigned dict_hash(unsigned char *str)
 	unsigned long hash = 5381;
 	
 	int mix = str[0] * B;
-	int c = str[strlen(str) - 1] * A;
+	
+	int c;
+
+	if (str[0] == '\0')
+	{
+		c = str[0] * A;
+	}
+	else
+	{
+		c = str[strlen(str) - 1] * A;		
+	}
 	
 	while (c = *str++)
 	{
