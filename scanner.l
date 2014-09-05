@@ -39,7 +39,7 @@ INVALID           [^[:space:]]
 %%
 
    /* comments */
-{COMMENT}         
+{COMMENT}         // yylineno counts line-breaks automatically
 "/*"              BEGIN(ML_COMMENT);
 <ML_COMMENT>.     
 <ML_COMMENT>\n    // yylineno counts line-breaks automatically
