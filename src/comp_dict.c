@@ -89,9 +89,16 @@ int get_symbol_line(char *symbol)
 	return item->last_seen;
 }
 
-void add_or_update_symbol_line(char *symbol, int line)
+void add_or_update_symbol_line(char *key, int symbol_length, int line)
 {
-	int index = dict_index(symbol);
+	char *symbol;
+	int index;
+
+	symbol = (char *) malloc((symbol_length + 1) * sizeof(char));
+	strncpy(symbol, key, symbol_length);
+	symbol[symbol_length] = '\0';
+
+	index = dict_index(symbol);
 	
 	comp_dict_item_t *item = symbols[index];
 	
@@ -104,8 +111,7 @@ void add_or_update_symbol_line(char *symbol, int line)
 	{
 		item = (comp_dict_item_t *) malloc(sizeof(comp_dict_item_t));
 		
-		item->symbol = (char *) malloc((strlen(symbol) + 1) * sizeof(char));
-		strcpy(item->symbol, symbol);
+		item->symbol = symbol;
 		
 		item->next = symbols[index];
 		

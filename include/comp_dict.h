@@ -16,6 +16,6 @@ unsigned int dict_index(char *key);
 void dict_print();
 void dict_free();
 int get_symbol_line(char *symbol);
-void add_or_update_symbol_line(char *symbol, int line);
+void add_or_update_symbol_line(char *key, int symbol_length, int line);
 
 extern comp_dict_item_t *symbols[DICT_SIZE];
