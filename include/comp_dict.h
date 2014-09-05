@@ -11,9 +11,10 @@ struct _comp_dict_item_t
 
 typedef struct _comp_dict_item_t comp_dict_item_t;
 
-unsigned dict_hash(unsigned char *str);
-int dict_index(char *key);
+unsigned int dict_hash(char *str);
+unsigned int dict_index(char *key);
 void dict_print();
+void dict_free();
 int get_symbol_line(char *symbol);
 void add_or_update_symbol_line(char *symbol, int line);
 

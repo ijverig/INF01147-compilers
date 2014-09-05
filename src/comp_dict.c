@@ -5,7 +5,7 @@
 
 comp_dict_item_t *symbols[DICT_SIZE];
 
-unsigned dict_hash(unsigned char *str)
+unsigned int dict_hash(char *str)
 {
 	unsigned long hash = 5381;
 	
@@ -30,7 +30,7 @@ unsigned dict_hash(unsigned char *str)
 	return hash + mix;
 }
 
-int dict_index(char *key)
+unsigned int dict_index(char *key)
 {
 	return dict_hash(key) % DICT_SIZE;
 }
@@ -47,6 +47,25 @@ void dict_print()
 			printf("%2d %11p => %s (%3X) : %2d\n", index, item, item->symbol, dict_hash(item->symbol), get_symbol_line(item->symbol));
 			
 			item = item->next;
+		}
+	}
+}
+
+void dict_free()
+{
+	int index;
+	for (index = 0; index < DICT_SIZE; ++index)
+	{
+		comp_dict_item_t *item_next, *item = symbols[index];
+		
+		while (item != NULL)
+		{
+			item_next = item->next;
+			
+			free(item->symbol);
+			free(item);
+			
+			item = item_next;
 		}
 	}
 }
@@ -91,6 +110,10 @@ void add_or_update_symbol_line(char *symbol, int line)
 		item->next = symbols[index];
 		
 		symbols[index] = item;
+	}
+	else
+	{
+		free(symbol);
 	}
 	
 	item->last_seen = line;

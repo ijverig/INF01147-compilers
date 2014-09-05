@@ -19,4 +19,5 @@ void main_init (int argc, char **argv)
 void main_finalize (void)
 {
 	// dict_print();
+	dict_free();
 }
