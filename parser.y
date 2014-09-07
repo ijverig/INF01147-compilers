@@ -1,11 +1,19 @@
 /*
-  Coloque aqui o identificador do grupo e dos seus membros
-*/
+ * grupo: cc
+ *
+ * membros:
+ *    - Daniel Schmidt
+ *    - Matheus Cardoso
+ *
+ */
+
 %{
-#include <stdio.h>
+
+#include "main.h"
+
 %}
 
-/* Declaração dos tokens da linguagem */
+   /* tokens */
 %token TK_PR_INT
 %token TK_PR_FLOAT
 %token TK_PR_BOOL
@@ -35,8 +43,8 @@
 %token TOKEN_ERRO
 
 %%
-/* Regras (e ações) da gramática */
 
-programa:
+program:
+;
 
 %%
