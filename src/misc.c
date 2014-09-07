@@ -2,21 +2,21 @@
 
 extern int yylineno;
 
-int getLineNumber (void)
+int getLineNumber(void)
 {
-  return yylineno;
+	return yylineno;
 }
 
-void yyerror (char const *mensagem)
+void yyerror(char *s)
 {
-  fprintf (stderr, "%s\n", mensagem); //altere para que apareça a linha
+	fprintf(stderr, "line %d: %s\n", getLineNumber(), s);
 }
 
-void main_init (int argc, char **argv)
+void main_init(int argc, char **argv)
 {
 }
 
-void main_finalize (void)
+void main_finalize(void)
 {
 	// dict_print();
 	dict_free();

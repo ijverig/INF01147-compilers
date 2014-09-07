@@ -13,6 +13,8 @@
 
 %}
 
+%define parse.error verbose
+
    /* tokens */
 %token TK_PR_INT
 %token TK_PR_FLOAT
