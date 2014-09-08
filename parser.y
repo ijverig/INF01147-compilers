@@ -48,11 +48,20 @@
 
 program:
 	%empty
-|	program	var_decl ';'
+|	program	glo_decl ';'
+;
+
+glo_decl:
+	var_decl
+|	arr_decl
 ;
 
 var_decl:
 	type TK_IDENTIFICADOR
+;
+
+arr_decl:
+	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
 ;
 
 type:
