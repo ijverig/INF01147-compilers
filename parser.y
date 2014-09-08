@@ -47,6 +47,20 @@
 %%
 
 program:
+	%empty
+|	program	var_decl ';'
+;
+
+var_decl:
+	type TK_IDENTIFICADOR
+;
+
+type:
+	TK_PR_FLOAT
+|	TK_PR_INT
+|	TK_PR_CHAR
+|	TK_PR_BOOL
+|	TK_PR_STRING
 ;
 
 %%
