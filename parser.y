@@ -100,7 +100,8 @@ commands:
 ;
 
 command:
-	var_decl
+	';'
+|	var_decl
 |	attribution
 |	input
 |	output
