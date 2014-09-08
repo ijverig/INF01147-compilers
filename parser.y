@@ -154,6 +154,7 @@ expression:
 |	TK_IDENTIFICADOR
 |	TK_IDENTIFICADOR '[' expression ']'
 |	fun_call
+|	'-' expression
 |	expression '>' expression
 |	expression '<' expression
 |	expression TK_OC_EQ expression

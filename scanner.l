@@ -25,8 +25,8 @@ COMMENT           "//".*\n
 SPECIAL           [,;:()[\]{}+\-*/<>=!&$]
 
    /* literals */
-L_INT             -?[[:digit:]]+
-L_FLOAT           -?[[:digit:]]+"."[[:digit:]]+
+L_INT             [[:digit:]]+
+L_FLOAT           [[:digit:]]+"."[[:digit:]]+
 L_CHAR            '.'
 L_STRING          \"[^"]*\"
 
