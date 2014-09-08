@@ -1,0 +1,13 @@
+//espaços
+int a;
+float b;
+char v [15] ;
+int f2  (int x )
+{
+  return 2* x;
+}
+float my_function ()
+  { 
+  /* a=10; */
+  do while (a !=3) do while (5==9) do e[a+f(4+5)] = f(y[7]) while (v[a+1] != 4+1)  ;
+  }
