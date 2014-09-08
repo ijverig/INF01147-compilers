@@ -49,6 +49,7 @@
 program:
 	%empty
 |	program	glo_decl ';'
+|	program	fun_decl
 ;
 
 glo_decl:
@@ -62,6 +63,20 @@ var_decl:
 
 arr_decl:
 	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
+;
+
+fun_decl:
+	type TK_IDENTIFICADOR '(' params.opt ')' '{' '}'
+;
+
+params.opt:
+	%empty
+|	params
+;
+
+params:
+	var_decl
+|	params ',' var_decl
 ;
 
 type:
