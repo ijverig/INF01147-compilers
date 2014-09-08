@@ -50,7 +50,7 @@
 %left TK_OC_OR
 %left TK_OC_AND
 %left TK_OC_EQ TK_OC_NE 
-%left '>' '<' TK_OC_GE TK_OC_LE
+%nonassoc '>' '<' TK_OC_GE TK_OC_LE
 %left '+' '-'
 %left '*' '/'
 
