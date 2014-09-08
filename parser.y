@@ -66,7 +66,7 @@ arr_decl:
 ;
 
 fun_decl:
-	type TK_IDENTIFICADOR '(' params.opt ')' '{' '}'
+	type TK_IDENTIFICADOR '(' params.opt ')' comm_block
 ;
 
 params.opt:
@@ -77,6 +77,25 @@ params.opt:
 params:
 	var_decl
 |	params ',' var_decl
+;
+
+comm_block:
+	'{' commands.opt '}'
+;
+
+commands.opt:
+	%empty
+|	commands
+;
+
+commands:
+	command
+|	commands ';' command
+;
+
+command:
+	%empty
+|	var_decl
 ;
 
 type:
