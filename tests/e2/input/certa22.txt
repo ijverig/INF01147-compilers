@@ -1,0 +1,17 @@
+//função com blocos e variáveis locais em cada bloco e inteiro negativos
+int minha_funcao (float k, int l) 
+{
+	int a;
+        a=-5;
+        float p;
+        p=-a;
+        {
+                int c;
+                c= -70;
+                float k;
+                k= -3.0;
+                f(-4, 4+5, 11-4, 7 - 8, 4- 6, 4 -6, 3*8+3-5, 4 + -5 - 5 - -3)
+        }
+}
+int variavel_k[ 100 ];
+char variavel_x;
