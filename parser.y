@@ -44,6 +44,13 @@
 %token TK_IDENTIFICADOR
 %token TOKEN_ERRO
 
+%nonassoc TK_PR_THEN
+%nonassoc TK_PR_ELSE
+
+%left TK_OC_OR
+%left TK_OC_AND
+%left TK_OC_EQ TK_OC_NE 
+%left '>' '<' TK_OC_GE TK_OC_LE
 %left '+' '-'
 %left '*' '/'
 
@@ -87,17 +94,18 @@ comm_block:
 ;
 
 commands:
-	command
-|	commands ';' command
+	%empty
+|	command
+|	command ';' commands
 ;
 
 command:
-	%empty
-|	var_decl
+	var_decl
 |	attribution
 |	input
 |	output
 |	return
+|	flow_control
 |	fun_call
 |	comm_block
 ;
@@ -119,6 +127,13 @@ return:
 	TK_PR_RETURN expression
 ;
 
+flow_control:
+	TK_PR_IF '(' expression ')' TK_PR_THEN command
+|	TK_PR_IF '(' expression ')' TK_PR_THEN command TK_PR_ELSE command
+|	TK_PR_WHILE '(' expression ')' TK_PR_DO command
+|	TK_PR_DO command TK_PR_WHILE '(' expression ')'
+;
+
 fun_call:
 	TK_IDENTIFICADOR '(' args.opt ')'
 ;
@@ -138,6 +153,14 @@ expression:
 |	TK_IDENTIFICADOR
 |	TK_IDENTIFICADOR '[' expression ']'
 |	fun_call
+|	expression '>' expression
+|	expression '<' expression
+|	expression TK_OC_EQ expression
+|	expression TK_OC_NE expression
+|	expression TK_OC_GE expression
+|	expression TK_OC_LE expression
+|	expression TK_OC_OR expression
+|	expression TK_OC_AND expression
 |	expression '+' expression
 |	expression '-' expression
 |	expression '*' expression
