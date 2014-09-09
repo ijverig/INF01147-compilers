@@ -1,0 +1,3 @@
+//falta ponto-e-vírgula
+int goals
+int points;

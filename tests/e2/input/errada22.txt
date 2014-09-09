@@ -1,0 +1,4 @@
+//índice não-inteiro
+int ages[-1];
+int ages[3+5];
+int ages[4.5];

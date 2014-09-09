@@ -1,0 +1,8 @@
+//comando inexistente
+int main()
+{
+   if (3==33)
+      then puts "puts also does not exist"
+   else
+      printf("printf does not exist");
+}

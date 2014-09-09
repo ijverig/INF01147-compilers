@@ -1,0 +1,3 @@
+//tipo inexistente
+inteiro num;
+comp_dict_t *dict;
