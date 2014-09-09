@@ -95,6 +95,9 @@ command:
 	%empty
 |	var_decl
 |	attribution
+|	input
+|	output
+|	return
 |	fun_call
 |	comm_block
 ;
@@ -104,6 +107,17 @@ attribution:
 |	TK_IDENTIFICADOR '[' expression ']' '=' expression
 ;
 
+input:
+	TK_PR_INPUT TK_IDENTIFICADOR
+;
+
+output:
+	TK_PR_OUTPUT expressions
+;
+
+return:
+	TK_PR_RETURN expression
+;
 
 fun_call:
 	TK_IDENTIFICADOR '(' args.opt ')'
@@ -111,12 +125,12 @@ fun_call:
 
 args.opt:
 	%empty
-|	args
+|	expressions
 ;
 
-args:
+expressions:
 	expression
-|	args ',' expression
+|	expressions ',' expression
 ;
 
 expression:
@@ -128,6 +142,7 @@ expression:
 |	expression '-' expression
 |	expression '*' expression
 |	expression '/' expression
+|	'(' expression ')'
 ;
 
 literal:
