@@ -44,6 +44,9 @@
 %token TK_IDENTIFICADOR
 %token TOKEN_ERRO
 
+%left '+' '-'
+%left '*' '/'
+
 %%
 
 program:
@@ -80,12 +83,7 @@ params:
 ;
 
 comm_block:
-	'{' commands.opt '}'
-;
-
-commands.opt:
-	%empty
-|	commands
+	'{' commands '}'
 ;
 
 commands:
@@ -96,6 +94,49 @@ commands:
 command:
 	%empty
 |	var_decl
+|	attribution
+|	fun_call
+|	comm_block
+;
+
+attribution:
+	TK_IDENTIFICADOR '=' expression
+|	TK_IDENTIFICADOR '[' expression ']' '=' expression
+;
+
+
+fun_call:
+	TK_IDENTIFICADOR '(' args.opt ')'
+;
+
+args.opt:
+	%empty
+|	args
+;
+
+args:
+	expression
+|	args ',' expression
+;
+
+expression:
+	literal
+|	TK_IDENTIFICADOR
+|	TK_IDENTIFICADOR '[' expression ']'
+|	fun_call
+|	expression '+' expression
+|	expression '-' expression
+|	expression '*' expression
+|	expression '/' expression
+;
+
+literal:
+	TK_LIT_INT
+|	TK_LIT_FLOAT
+|	TK_LIT_CHAR
+|	TK_LIT_STRING
+|	TK_LIT_TRUE
+|	TK_LIT_FALSE
 ;
 
 type:
