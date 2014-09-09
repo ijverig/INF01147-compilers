@@ -5,24 +5,25 @@
 
 comp_dict_item_t *symbols[DICT_SIZE];
 
-unsigned int dict_hash(char *str)
+unsigned int dict_hash(char *s)
 {
 	unsigned long hash = 5381;
 	
-	int mix = str[0] * B;
+	int mix = s[0] * B;
 	
 	int c;
 
-	if (str[0] == '\0')
+	// handle empty string symbols
+	if (s[0] == '\0')
 	{
-		c = str[0] * A;
+		c = s[0] * A;
 	}
 	else
 	{
-		c = str[strlen(str) - 1] * A;		
+		c = s[strlen(s) - 1] * A;
 	}
 	
-	while (c = *str++)
+	while (c = *s++)
 	{
 		hash = ((hash << 5) + hash) ^ c;
 	}
@@ -44,7 +45,7 @@ void dict_print()
 		
 		while (item != NULL)
 		{
-			printf("%2d %11p => %s (%3X) : %2d\n", index, item, item->symbol, dict_hash(item->symbol), get_symbol_line(item->symbol));
+			printf("%2d %11p => %s (%3X) : %2d\n", index, item, item->symbol, dict_hash(item->symbol), item->last_seen);
 			
 			item = item->next;
 		}
@@ -70,13 +71,13 @@ void dict_free()
 	}
 }
 
-int get_symbol_line(char *symbol)
+int get_symbol_line(char *key)
 {
-	int index = dict_index(symbol);
+	int index = dict_index(key);
 	
 	comp_dict_item_t *item = symbols[index];
 	
-	while ((item != NULL) && (strcmp(item->symbol, symbol) != 0))
+	while ((item != NULL) && (strcmp(item->symbol, key) != 0))
 	{
 		item = item->next;
 	}
@@ -91,22 +92,22 @@ int get_symbol_line(char *symbol)
 
 void add_or_update_symbol_line(char *key, int symbol_length, int line)
 {
-	char *symbol;
-	int index;
-
-	symbol = (char *) malloc((symbol_length + 1) * sizeof(char));
+	// trim key quotes
+	char *symbol = (char *) malloc((symbol_length + 1) * sizeof(char));
 	strncpy(symbol, key, symbol_length);
 	symbol[symbol_length] = '\0';
 
-	index = dict_index(symbol);
+	int index = dict_index(symbol);
 	
 	comp_dict_item_t *item = symbols[index];
 	
+	// find key in the bucket
 	while ((item != NULL) && (strcmp(item->symbol, symbol) != 0))
 	{
 		item = item->next;
 	}
 	
+	// create new entry if not found
 	if (item == NULL)
 	{
 		item = (comp_dict_item_t *) malloc(sizeof(comp_dict_item_t));
@@ -117,6 +118,7 @@ void add_or_update_symbol_line(char *key, int symbol_length, int line)
 		
 		symbols[index] = item;
 	}
+	// free symbol if found, since the entry already has the symbol and only the line needs update
 	else
 	{
 		free(symbol);
