@@ -1,4 +1,5 @@
 #include "misc.h"
+#include <stdarg.h>
 
 extern int yylineno;
 
@@ -7,9 +8,14 @@ int getLineNumber(void)
 	return yylineno;
 }
 
-void yyerror(char *s)
+void yyerror(char *s, ...)
 {
-	fprintf(stderr, "line %d: %s\n", getLineNumber(), s);
+	va_list args;
+	va_start(args, s);
+	fprintf(stderr, "line %d: ", getLineNumber());
+	vfprintf(stderr, s, args);
+	fprintf(stderr, "\n");
+	va_end(args); 
 }
 
 void main_init(int argc, char **argv)
