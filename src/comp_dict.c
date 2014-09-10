@@ -1,7 +1,6 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include "comp_dict.h"
+#include "main.h"
 
 comp_dict_item_t *symbols[DICT_SIZE];
 
@@ -45,7 +44,30 @@ void dict_print()
 		
 		while (item != NULL)
 		{
-			printf("%2d %11p => %s (%3X) : %2d\n", index, item, item->symbol, dict_hash(item->symbol), item->last_seen);
+			printf("%4d %11p => ", index, item);
+			
+			switch (item->type)
+			{
+				case IKS_SIMBOLO_LITERAL_INT:
+					printf("(%c) %d ", 'i', item->symbol.int_value);
+					break;
+				case IKS_SIMBOLO_LITERAL_FLOAT:
+					printf("(%c) %f ", 'f', item->symbol.float_value);
+					break;
+				case IKS_SIMBOLO_LITERAL_CHAR:
+					printf("(%c) %c ", 'c', item->symbol.char_value);
+					break;
+				case IKS_SIMBOLO_LITERAL_STRING:
+					printf("(%c) %s ", 's', item->symbol.string_value);
+					break;
+				case IKS_SIMBOLO_LITERAL_BOOL:
+					printf("(%c) %d ", 'b', item->symbol.bool_value);
+					break;
+				case IKS_SIMBOLO_IDENTIFICADOR:
+					printf("(%c) %s ", 'n', item->symbol.string_value);
+			}
+			
+			printf("%s [%3X] : %2d\n", item->key, dict_hash(item->key), item->last_seen);
 			
 			item = item->next;
 		}
@@ -63,7 +85,7 @@ void dict_free()
 		{
 			item_next = item->next;
 			
-			free(item->symbol);
+			free(item->key);
 			free(item);
 			
 			item = item_next;
@@ -77,7 +99,7 @@ int get_symbol_line(char *key)
 	
 	comp_dict_item_t *item = symbols[index];
 	
-	while ((item != NULL) && (strcmp(item->symbol, key) != 0))
+	while ((item != NULL) && (strcmp(item->key, key) != 0))
 	{
 		item = item->next;
 	}
@@ -90,11 +112,11 @@ int get_symbol_line(char *key)
 	return item->last_seen;
 }
 
-void add_or_update_symbol_line(char *key, int symbol_length, int line)
+void add_or_update_symbol_line(char *lexeme, int symbol_length, int type, int line)
 {
 	// trim key quotes
 	char *symbol = (char *) malloc((symbol_length + 1) * sizeof(char));
-	strncpy(symbol, key, symbol_length);
+	strncpy(symbol, lexeme, symbol_length);
 	symbol[symbol_length] = '\0';
 
 	int index = dict_index(symbol);
@@ -102,7 +124,7 @@ void add_or_update_symbol_line(char *key, int symbol_length, int line)
 	comp_dict_item_t *item = symbols[index];
 	
 	// find key in the bucket
-	while ((item != NULL) && (strcmp(item->symbol, symbol) != 0))
+	while ((item != NULL) && (strcmp(item->key, symbol) != 0))
 	{
 		item = item->next;
 	}
@@ -112,7 +134,29 @@ void add_or_update_symbol_line(char *key, int symbol_length, int line)
 	{
 		item = (comp_dict_item_t *) malloc(sizeof(comp_dict_item_t));
 		
-		item->symbol = symbol;
+		item->key = symbol;
+
+		switch (type)
+		{
+			case IKS_SIMBOLO_LITERAL_INT:
+				item->symbol.int_value = atoi(item->key);
+				break;
+			case IKS_SIMBOLO_LITERAL_FLOAT:
+				item->symbol.float_value = atof(item->key);
+				break;
+			case IKS_SIMBOLO_LITERAL_CHAR:
+				item->symbol.char_value = item->key[0];
+				break;
+			case IKS_SIMBOLO_LITERAL_STRING:
+			case IKS_SIMBOLO_IDENTIFICADOR:
+				item->symbol.string_value = item->key;
+				break;
+			case IKS_SIMBOLO_LITERAL_BOOL:
+				item->symbol.bool_value = !strcmp(item->key, "true");
+				break;
+		}
+
+		item->type = type;
 		
 		item->next = symbols[index];
 		

@@ -12,7 +12,7 @@
 
 %{
 
-#include "parser.h"
+#include "main.h"
 
 %}
 
@@ -72,15 +72,15 @@ return            return TK_PR_RETURN;
 "||"              return TK_OC_OR;
 
    /* literals */
-{L_INT}           {add_or_update_symbol_line(yytext, yyleng, yylineno); return TK_LIT_INT;}
-{L_FLOAT}         {add_or_update_symbol_line(yytext, yyleng, yylineno); return TK_LIT_FLOAT;}
-true              {add_or_update_symbol_line(yytext, yyleng, yylineno); return TK_LIT_TRUE;}
-false             {add_or_update_symbol_line(yytext, yyleng, yylineno); return TK_LIT_FALSE;}
-{L_CHAR}          {add_or_update_symbol_line(&yytext[1], yyleng - 2, yylineno); return TK_LIT_CHAR;}
-{L_STRING}        {add_or_update_symbol_line(&yytext[1], yyleng - 2, yylineno); return TK_LIT_STRING;}
+{L_INT}           {add_or_update_symbol_line(yytext, yyleng, IKS_SIMBOLO_LITERAL_INT, yylineno); return TK_LIT_INT;}
+{L_FLOAT}         {add_or_update_symbol_line(yytext, yyleng, IKS_SIMBOLO_LITERAL_FLOAT, yylineno); return TK_LIT_FLOAT;}
+true              {add_or_update_symbol_line(yytext, yyleng, IKS_SIMBOLO_LITERAL_BOOL, yylineno); return TK_LIT_TRUE;}
+false             {add_or_update_symbol_line(yytext, yyleng, IKS_SIMBOLO_LITERAL_BOOL, yylineno); return TK_LIT_FALSE;}
+{L_CHAR}          {add_or_update_symbol_line(&yytext[1], yyleng - 2, IKS_SIMBOLO_LITERAL_CHAR, yylineno); return TK_LIT_CHAR;}
+{L_STRING}        {add_or_update_symbol_line(&yytext[1], yyleng - 2, IKS_SIMBOLO_LITERAL_STRING, yylineno); return TK_LIT_STRING;}
 
    /* identifiers */
-{ID}              {add_or_update_symbol_line(yytext, yyleng, yylineno); return TK_IDENTIFICADOR;}
+{ID}              {add_or_update_symbol_line(yytext, yyleng, IKS_SIMBOLO_IDENTIFICADOR, yylineno); return TK_IDENTIFICADOR;}
 
    /* invalid characters */
 {INVALID}         return TOKEN_ERRO;
