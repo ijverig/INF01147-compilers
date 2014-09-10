@@ -93,13 +93,13 @@ void dict_free()
 	}
 }
 
-int get_symbol_line(char *key)
+int get_symbol_line(char *key, int type)
 {
 	int index = dict_index(key);
 	
 	comp_dict_item_t *item = symbols[index];
 	
-	while ((item != NULL) && (strcmp(item->key, key) != 0))
+	while ((item != NULL) && ((strcmp(item->key, key) != 0) || (item->type != type)))
 	{
 		item = item->next;
 	}
@@ -124,7 +124,7 @@ void add_or_update_symbol_line(char *lexeme, int symbol_length, int type, int li
 	comp_dict_item_t *item = symbols[index];
 	
 	// find key in the bucket
-	while ((item != NULL) && (strcmp(item->key, symbol) != 0))
+	while ((item != NULL) && ((strcmp(item->key, symbol) != 0) || (item->type != type)))
 	{
 		item = item->next;
 	}
