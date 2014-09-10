@@ -66,9 +66,9 @@ void dict_print()
 				case IKS_SIMBOLO_IDENTIFICADOR:
 					printf("(%c) %s ", 'n', item->symbol.string_value);
 			}
-			
+
 			printf("%s [%3X] : %2d\n", item->key, dict_hash(item->key), item->last_seen);
-			
+
 			item = item->next;
 		}
 	}
@@ -112,7 +112,7 @@ int get_symbol_line(char *key, int type)
 	return item->last_seen;
 }
 
-void add_or_update_symbol_line(char *lexeme, int symbol_length, int type, int line)
+comp_dict_item_t *add_or_update_symbol_line(char *lexeme, int symbol_length, int type, int line)
 {
 	// trim key quotes
 	char *symbol = (char *) malloc((symbol_length + 1) * sizeof(char));
@@ -169,4 +169,6 @@ void add_or_update_symbol_line(char *lexeme, int symbol_length, int type, int li
 	}
 	
 	item->last_seen = line;
+
+	return item;
 }
