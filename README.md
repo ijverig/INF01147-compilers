@@ -8,6 +8,6 @@ Steps for building and running the project
 ```
 mkdir build
 cd build
-cmake ..
-make && echo "" && ./main < ../scanner.test
+cmake -DETAPA_1=OFF -DETAPA_2=ON ..
+make && echo "" && ./main < tests/e2/input/certa18.txt
 ```
