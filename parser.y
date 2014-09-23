@@ -61,11 +61,7 @@ extern char *yytext;
 program:
 	%empty
 |	program	glo_decl ';'
-|	program glo_decl error																	{yyerror("global declaration must end with semicolon (;), not \"%s\"", yytext); return IKS_SYNTAX_ERRO;}
-|	program type ';'																		{yyerror("variable declaration must have a name"); return IKS_SYNTAX_ERRO;}
 |	program	fun_decl
-|	program	fun_decl ';'																	{yyerror("function declaration have an extra semicolon (;) in the end"); return IKS_SYNTAX_ERRO;}
-|	program	attribution																		{yyerror("command (%s) outside function scope", yytext); return IKS_SYNTAX_ERRO;}
 ;
 
 glo_decl:
@@ -79,7 +75,6 @@ var_decl:
 
 arr_decl:
 	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
-|	type TK_IDENTIFICADOR '[' error ']'														{yyerror("array declaration must have integer index size, not \"%s\"", yytext); return IKS_SYNTAX_ERRO;}
 ;
 
 fun_decl:
@@ -94,7 +89,6 @@ params.opt:
 params:
 	var_decl
 |	params ',' var_decl
-|	params ','																				{yyerror("extra comma in the end of argument list"); return IKS_SYNTAX_ERRO;}
 ;
 
 comm_block:
@@ -117,7 +111,6 @@ command:
 |	flow_control
 |	fun_call
 |	comm_block
-|	error																					{yyerror("command must be variable declaration, attribution, input, output, return, flow control or block, not \"%s\"", yytext); return IKS_SYNTAX_ERRO;}
 ;
 
 attribution:
@@ -127,7 +120,6 @@ attribution:
 
 input:
 	TK_PR_INPUT TK_IDENTIFICADOR
-|	TK_PR_INPUT	literal																		{yyerror("input arguments must be variables, not literals (%s)", yytext); return IKS_SYNTAX_ERRO;}
 ;
 
 output:
@@ -140,7 +132,6 @@ return:
 
 flow_control:
 	TK_PR_IF '(' expression ')' TK_PR_THEN command
-|	TK_PR_IF '(' expression ')' command														{yyerror("if needs a then before command"); return IKS_SYNTAX_ERRO;}
 |	TK_PR_IF '(' expression ')' TK_PR_THEN command TK_PR_ELSE command
 |	TK_PR_WHILE '(' expression ')' TK_PR_DO command
 |	TK_PR_DO command TK_PR_WHILE '(' expression ')'
@@ -196,7 +187,6 @@ type:
 |	TK_PR_CHAR
 |	TK_PR_BOOL
 |	TK_PR_STRING
-|	error																					{yyerror("type must be int, float, bool, char or string, not \"%s\"", yytext); return IKS_SYNTAX_ERRO;}
 ;
 
 %%
