@@ -58,6 +58,7 @@ extern char *yytext;
 %nonassoc '>' '<' TK_OC_GE TK_OC_LE
 %left '+' '-'
 %left '*' '/'
+%nonassoc '!'
 
 %%
 
@@ -271,6 +272,11 @@ expression:
 |	'-' expression
 			{
 					$$ = make_node("-");
+					add_child($$, $2);
+			}
+|	'!' expression
+			{
+					$$ = make_node("!");
 					add_child($$, $2);
 			}
 |	expression '>' expression
