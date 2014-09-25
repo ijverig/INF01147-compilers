@@ -65,7 +65,7 @@ void add_sibling(comp_tree_t *node, comp_tree_t *sibling)
 	}
 	else
 	{
-		tree_add_sibling(node->sibling, sibling);
+		add_sibling(node->sibling, sibling);
 	}
 }
 
