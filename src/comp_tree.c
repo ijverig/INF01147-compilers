@@ -111,7 +111,7 @@ void tree_print_indented(comp_tree_t *node, int level)
 			printf("    ");
 		}
 		
-		printf("%s\n", iks_type2string(node->type));
+		printf("%s %s\n", iks_type2string(node->type), (node->type == IKS_AST_IDENTIFICADOR || node->type == IKS_AST_LITERAL || node->type == IKS_AST_FUNCAO) ? node->attributes->key : "");
 		
 		tree_print_indented(node->child, level + 1);
 		tree_print_indented(node->sibling, level);
@@ -123,6 +123,7 @@ comp_tree_t *make_node(int type)
 	comp_tree_t *node = (comp_tree_t *) malloc(sizeof(comp_tree_t));
 	
 	node->type = type;
+	node->attributes = NULL;
 	node->child = node->sibling = NULL;
 
 	return node;

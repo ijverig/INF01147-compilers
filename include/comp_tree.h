@@ -1,6 +1,7 @@
 struct _comp_tree_t
 {
     int type;
+    struct _comp_dict_item_t *attributes;
     struct _comp_tree_t *sibling;
     struct _comp_tree_t *child;
 };

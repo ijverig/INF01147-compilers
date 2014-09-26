@@ -96,6 +96,7 @@ fun_decl:
 			{
 					$$ = make_node(IKS_AST_FUNCAO);
 					add_child($$, $6->child);
+					$$->attributes = $2->attributes;
 			}
 ;
 
@@ -250,6 +251,7 @@ expression:
 	literal
 			{
 					$$ = make_node(IKS_AST_LITERAL);
+					$$->attributes = (comp_dict_item_t *) $1;
 			}
 |	identifier
 			{
@@ -355,6 +357,7 @@ identifier:
 	TK_IDENTIFICADOR
 			{
 					$$ = make_node(IKS_AST_IDENTIFICADOR);
+					$$->attributes = (comp_dict_item_t *) $1;
 			}
 ;
 
