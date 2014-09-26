@@ -10,7 +10,7 @@
 %{
 
 #include "main.h"
-#include "string.h"
+#include "iks_ast.h"
 
 extern char *yytext;
 
@@ -65,7 +65,7 @@ extern char *yytext;
 program:
 	%empty
 			{
-					$$ = ast = make_node("program");
+					$$ = ast = make_node(IKS_AST_PROGRAMA);
 			}
 |	program	glo_decl ';'
 |	program	fun_decl
@@ -94,10 +94,7 @@ arr_decl:
 fun_decl:
 	type identifier '(' params.opt ')' comm_block
 			{
-					char *l = (char *) malloc(sizeof(char) * (sizeof("fun_decl ") + strlen($2->label + 3) + 1));
-					strcpy(l, "fun_decl ");
-					strcat(l, $2->label + 3);
-					$$ = make_node(l);
+					$$ = make_node(IKS_AST_FUNCAO);
 					add_child($$, $6->child);
 			}
 ;
@@ -115,7 +112,7 @@ params:
 comm_block:
 	'{' commands '}'
 			{
-					$$ = make_node("comm_block");
+					$$ = make_node(IKS_AST_BLOCO);
 					add_child($$, $2);
 			}
 ;
@@ -161,7 +158,7 @@ command:
 attribution:
 	lval '=' expression
 			{
-					$$ = make_node("attribution");
+					$$ = make_node(IKS_AST_ATRIBUICAO);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
@@ -175,7 +172,7 @@ lval:
 input:
 	TK_PR_INPUT identifier
 			{
-					$$ = make_node("input");
+					$$ = make_node(IKS_AST_INPUT);
 					add_child($$, $2);
 			}
 ;
@@ -183,7 +180,7 @@ input:
 output:
 	TK_PR_OUTPUT expressions
 			{
-					$$ = make_node("output");
+					$$ = make_node(IKS_AST_OUTPUT);
 					add_child($$, $2);
 			}
 ;
@@ -191,7 +188,7 @@ output:
 return:
 	TK_PR_RETURN expression
 			{
-					$$ = make_node("return");
+					$$ = make_node(IKS_AST_RETURN);
 					add_child($$, $2);
 			}
 ;
@@ -199,26 +196,26 @@ return:
 flow_control:
 	TK_PR_IF '(' expression ')' TK_PR_THEN command
 			{
-					$$ = make_node("if");
+					$$ = make_node(IKS_AST_IF_ELSE);
 					add_child($$, $3);
 					add_child($$, $6);
 			}
 |	TK_PR_IF '(' expression ')' TK_PR_THEN command TK_PR_ELSE command
 			{
-					$$ = make_node("if");
+					$$ = make_node(IKS_AST_IF_ELSE);
 					add_child($$, $3);
 					add_child($$, $6);
 					add_child($$, $8);
 			}
 |	TK_PR_WHILE '(' expression ')' TK_PR_DO command
 			{
-					$$ = make_node("while");
+					$$ = make_node(IKS_AST_WHILE_DO);
 					add_child($$, $3);
 					add_child($$, $6);
 			}
 |	TK_PR_DO command TK_PR_WHILE '(' expression ')'
 			{
-					$$ = make_node("do");
+					$$ = make_node(IKS_AST_DO_WHILE);
 					add_child($$, $2);
 					add_child($$, $5);
 			}
@@ -227,7 +224,7 @@ flow_control:
 fun_call:
 	identifier '(' args.opt ')'
 			{
-					$$ = make_node("fun_call");
+					$$ = make_node(IKS_AST_CHAMADA_DE_FUNCAO);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
@@ -252,10 +249,7 @@ expressions:
 expression:
 	literal
 			{
-					char *l = (char *) malloc(sizeof(char) * (sizeof("LIT ") + strlen($1->label) + 1));
-					strcpy(l, "LIT ");
-					strcat(l, $1->label);
-					$$ = make_node(l);
+					$$ = make_node(IKS_AST_LITERAL);
 			}
 |	identifier
 			{
@@ -271,83 +265,83 @@ expression:
 			}
 |	'-' expression
 			{
-					$$ = make_node("-");
+					$$ = make_node(IKS_AST_ARIM_INVERSAO);
 					add_child($$, $2);
 			}
 |	'!' expression
 			{
-					$$ = make_node("!");
+					$$ = make_node(IKS_AST_LOGICO_COMP_NEGACAO);
 					add_child($$, $2);
 			}
 |	expression '>' expression
 			{
-					$$ = make_node(">");
+					$$ = make_node(IKS_AST_LOGICO_COMP_G);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '<' expression
 			{
-					$$ = make_node("<");
+					$$ = make_node(IKS_AST_LOGICO_COMP_L);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_EQ expression
 			{
-					$$ = make_node("==");
+					$$ = make_node(IKS_AST_LOGICO_COMP_IGUAL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_NE expression
 			{
-					$$ = make_node("!=");
+					$$ = make_node(IKS_AST_LOGICO_COMP_DIF);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_GE expression
 			{
-					$$ = make_node(">=");
+					$$ = make_node(IKS_AST_LOGICO_COMP_GE);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_LE expression
 			{
-					$$ = make_node("<=");
+					$$ = make_node(IKS_AST_LOGICO_COMP_LE);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_OR expression
 			{
-					$$ = make_node("||");
+					$$ = make_node(IKS_AST_LOGICO_OU);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_AND expression
 			{
-					$$ = make_node("&&");
+					$$ = make_node(IKS_AST_LOGICO_E);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '+' expression
 			{
-					$$ = make_node("+");
+					$$ = make_node(IKS_AST_ARIM_SOMA);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '-' expression
 			{
-					$$ = make_node("-");
+					$$ = make_node(IKS_AST_ARIM_SUBTRACAO);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '*' expression
 			{
-					$$ = make_node("*");
+					$$ = make_node(IKS_AST_ARIM_MULTIPLICACAO);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '/' expression
 			{
-					$$ = make_node("÷");
+					$$ = make_node(IKS_AST_ARIM_DIVISAO);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
@@ -360,17 +354,14 @@ expression:
 identifier:
 	TK_IDENTIFICADOR
 			{
-					char *l = (char *) malloc(sizeof(char) * (sizeof("ID ") + strlen($1->label) + 1));
-					strcpy(l, "ID ");
-					strcat(l, $1->label);
-					$$ = make_node(l);
+					$$ = make_node(IKS_AST_IDENTIFICADOR);
 			}
 ;
 
 array:
 	identifier '[' expression ']'
 			{
-					$$ = make_node("array");
+					$$ = make_node(IKS_AST_VETOR_INDEXADO);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
