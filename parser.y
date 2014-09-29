@@ -14,6 +14,8 @@
 
 extern char *yytext;
 
+comp_tree_t *last_fun_decl;
+
 %}
 
 %define api.value.type {comp_tree_t *}
@@ -65,13 +67,13 @@ extern char *yytext;
 program:
 	%empty
 			{
-					$$ = ast = make_node(IKS_AST_PROGRAMA);
+					$$ = ast = last_fun_decl = make_node(IKS_AST_PROGRAMA, NULL);
 			}
 |	program	glo_decl ';'
 |	program	fun_decl
 			{
-					$$ = $1;
-					add_child($$, $2);
+					add_child(last_fun_decl, $2);
+					last_fun_decl = $2;
 			}
 ;
 
@@ -81,22 +83,21 @@ glo_decl:
 ;
 
 var_decl:
-	type identifier
+	type TK_IDENTIFICADOR
 			{
 					$$ = NULL;
 			}
 ;
 
 arr_decl:
-	type identifier '[' TK_LIT_INT ']'
+	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
 ;
 
 fun_decl:
-	type identifier '(' params.opt ')' comm_block
+	type TK_IDENTIFICADOR '(' params.opt ')' '{' commands '}'
 			{
-					$$ = make_node(IKS_AST_FUNCAO);
-					add_child($$, $6->child);
-					$$->attributes = $2->attributes;
+					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $2);
+					add_child($$, $7);
 			}
 ;
 
@@ -113,7 +114,7 @@ params:
 comm_block:
 	'{' commands '}'
 			{
-					$$ = make_node(IKS_AST_BLOCO);
+					$$ = make_node(IKS_AST_BLOCO, NULL);
 					add_child($$, $2);
 			}
 ;
@@ -131,9 +132,9 @@ commands:
 			{
 					if ($1 != NULL)
 					{
-						add_sibling($1, $3);
+						add_child($1, $3);
 					}
-					//ignore local variable declarations
+					//ignore local variable declarations and empty commands
 					else
 					{
 						$$ = $3;
@@ -159,7 +160,7 @@ command:
 attribution:
 	lval '=' expression
 			{
-					$$ = make_node(IKS_AST_ATRIBUICAO);
+					$$ = make_node(IKS_AST_ATRIBUICAO, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
@@ -173,7 +174,7 @@ lval:
 input:
 	TK_PR_INPUT identifier
 			{
-					$$ = make_node(IKS_AST_INPUT);
+					$$ = make_node(IKS_AST_INPUT, NULL);
 					add_child($$, $2);
 			}
 ;
@@ -181,7 +182,7 @@ input:
 output:
 	TK_PR_OUTPUT expressions
 			{
-					$$ = make_node(IKS_AST_OUTPUT);
+					$$ = make_node(IKS_AST_OUTPUT, NULL);
 					add_child($$, $2);
 			}
 ;
@@ -189,7 +190,7 @@ output:
 return:
 	TK_PR_RETURN expression
 			{
-					$$ = make_node(IKS_AST_RETURN);
+					$$ = make_node(IKS_AST_RETURN, NULL);
 					add_child($$, $2);
 			}
 ;
@@ -197,26 +198,26 @@ return:
 flow_control:
 	TK_PR_IF '(' expression ')' TK_PR_THEN command
 			{
-					$$ = make_node(IKS_AST_IF_ELSE);
+					$$ = make_node(IKS_AST_IF_ELSE, NULL);
 					add_child($$, $3);
 					add_child($$, $6);
 			}
 |	TK_PR_IF '(' expression ')' TK_PR_THEN command TK_PR_ELSE command
 			{
-					$$ = make_node(IKS_AST_IF_ELSE);
+					$$ = make_node(IKS_AST_IF_ELSE, NULL);
 					add_child($$, $3);
 					add_child($$, $6);
 					add_child($$, $8);
 			}
 |	TK_PR_WHILE '(' expression ')' TK_PR_DO command
 			{
-					$$ = make_node(IKS_AST_WHILE_DO);
+					$$ = make_node(IKS_AST_WHILE_DO, NULL);
 					add_child($$, $3);
 					add_child($$, $6);
 			}
 |	TK_PR_DO command TK_PR_WHILE '(' expression ')'
 			{
-					$$ = make_node(IKS_AST_DO_WHILE);
+					$$ = make_node(IKS_AST_DO_WHILE, NULL);
 					add_child($$, $2);
 					add_child($$, $5);
 			}
@@ -225,7 +226,7 @@ flow_control:
 fun_call:
 	identifier '(' args.opt ')'
 			{
-					$$ = make_node(IKS_AST_CHAMADA_DE_FUNCAO);
+					$$ = make_node(IKS_AST_CHAMADA_DE_FUNCAO, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
@@ -233,7 +234,13 @@ fun_call:
 
 args.opt:
 	%empty
+			{
+					$$ = NULL;
+			}
 |	expressions
+			{
+					$$ = $1;
+			}
 ;
 
 expressions:
@@ -241,17 +248,16 @@ expressions:
 			{
 					$$ = $1;
 			}
-|	expressions ',' expression
+|	expression ',' expressions
 			{
-					add_sibling($1, $3);
+					add_child($1, $3);
 			}
 ;
 
 expression:
 	literal
 			{
-					$$ = make_node(IKS_AST_LITERAL);
-					$$->attributes = (comp_dict_item_t *) $1;
+					$$ = make_node(IKS_AST_LITERAL, (comp_dict_item_t *) $1);
 			}
 |	identifier
 			{
@@ -267,83 +273,83 @@ expression:
 			}
 |	'-' expression
 			{
-					$$ = make_node(IKS_AST_ARIM_INVERSAO);
+					$$ = make_node(IKS_AST_ARIM_INVERSAO, NULL);
 					add_child($$, $2);
 			}
 |	'!' expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_NEGACAO);
+					$$ = make_node(IKS_AST_LOGICO_COMP_NEGACAO, NULL);
 					add_child($$, $2);
 			}
 |	expression '>' expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_G);
+					$$ = make_node(IKS_AST_LOGICO_COMP_G, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '<' expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_L);
+					$$ = make_node(IKS_AST_LOGICO_COMP_L, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_EQ expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_IGUAL);
+					$$ = make_node(IKS_AST_LOGICO_COMP_IGUAL, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_NE expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_DIF);
+					$$ = make_node(IKS_AST_LOGICO_COMP_DIF, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_GE expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_GE);
+					$$ = make_node(IKS_AST_LOGICO_COMP_GE, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_LE expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_LE);
+					$$ = make_node(IKS_AST_LOGICO_COMP_LE, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_OR expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_OU);
+					$$ = make_node(IKS_AST_LOGICO_OU, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression TK_OC_AND expression
 			{
-					$$ = make_node(IKS_AST_LOGICO_E);
+					$$ = make_node(IKS_AST_LOGICO_E, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '+' expression
 			{
-					$$ = make_node(IKS_AST_ARIM_SOMA);
+					$$ = make_node(IKS_AST_ARIM_SOMA, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '-' expression
 			{
-					$$ = make_node(IKS_AST_ARIM_SUBTRACAO);
+					$$ = make_node(IKS_AST_ARIM_SUBTRACAO, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '*' expression
 			{
-					$$ = make_node(IKS_AST_ARIM_MULTIPLICACAO);
+					$$ = make_node(IKS_AST_ARIM_MULTIPLICACAO, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
 |	expression '/' expression
 			{
-					$$ = make_node(IKS_AST_ARIM_DIVISAO);
+					$$ = make_node(IKS_AST_ARIM_DIVISAO, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}
@@ -356,15 +362,14 @@ expression:
 identifier:
 	TK_IDENTIFICADOR
 			{
-					$$ = make_node(IKS_AST_IDENTIFICADOR);
-					$$->attributes = (comp_dict_item_t *) $1;
+					$$ = make_node(IKS_AST_IDENTIFICADOR, (comp_dict_item_t *) $1);
 			}
 ;
 
 array:
 	identifier '[' expression ']'
 			{
-					$$ = make_node(IKS_AST_VETOR_INDEXADO);
+					$$ = make_node(IKS_AST_VETOR_INDEXADO, NULL);
 					add_child($$, $1);
 					add_child($$, $3);
 			}

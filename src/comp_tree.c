@@ -118,14 +118,16 @@ void tree_print_indented(comp_tree_t *node, int level)
 	}
 }
 
-comp_tree_t *make_node(int type)
+comp_tree_t *make_node(int type, comp_dict_item_t *attributes)
 {
 	comp_tree_t *node = (comp_tree_t *) malloc(sizeof(comp_tree_t));
 	
 	node->type = type;
-	node->attributes = NULL;
+	node->attributes = attributes;
 	node->child = node->sibling = NULL;
-
+	
+	gv_declare(type, node, (node->type == IKS_AST_IDENTIFICADOR || node->type == IKS_AST_LITERAL || node->type == IKS_AST_FUNCAO) ? node->attributes->key : NULL);
+	
 	return node;
 }
 
@@ -136,6 +138,11 @@ void tree_add_child(comp_tree_t *node, comp_tree_t *child)
 
 void add_child(comp_tree_t *node, comp_tree_t *child)
 {
+	if (child == NULL)
+	{
+		return;
+	}
+	
 	if (node->child == NULL)
 	{
 		tree_add_child(node, child);
@@ -144,6 +151,8 @@ void add_child(comp_tree_t *node, comp_tree_t *child)
 	{
 		add_sibling(node->child, child);
 	}
+	
+	gv_connect(node, child);
 }
 
 void tree_add_sibling(comp_tree_t *node, comp_tree_t *sibling)
@@ -153,6 +162,11 @@ void tree_add_sibling(comp_tree_t *node, comp_tree_t *sibling)
 
 void add_sibling(comp_tree_t *node, comp_tree_t *sibling)
 {
+	if (sibling == NULL)
+	{
+		return;
+	}
+	
 	if (node->sibling == NULL)
 	{
 		tree_add_sibling(node, sibling);

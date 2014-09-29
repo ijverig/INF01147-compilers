@@ -25,7 +25,6 @@ void main_init(int argc, char **argv)
 
 void main_finalize(void)
 {
-	tree_print(ast);
 	tree_free(ast);
 	dict_free();
 }
