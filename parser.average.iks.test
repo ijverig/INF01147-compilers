@@ -1,0 +1,30 @@
+// calcula a média de valores não-negativos fornecidos
+
+float average()
+{
+	int n;
+	int sum;
+	int amount;
+	
+	n = 0;
+	sum = 0;
+	amount = -1;
+	while (n >= 0)
+	do
+	{
+		sum = sum + n;
+		
+		amount = amount + 1;
+		
+		input n
+	};
+	
+	return sum / amount
+}
+
+int main()
+{
+	output average();
+	
+	return 0
+}

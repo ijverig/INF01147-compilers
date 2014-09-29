@@ -1,0 +1,25 @@
+// calcula potenciação
+
+float _pow(float base, int exponent, float result)
+{
+	if (exponent == 0)
+	then return result;
+	
+	_pow(base, exponent - 1, base * result)
+}
+
+float pow(int base, int exponent)
+{
+	return _pow(base, exponent, 1)
+}
+
+int main()
+{
+	output 237, '^', 1, " = ", pow(237, 1);		// pow(237, 1)	= 237
+	output 2, '^', 12, " = ", pow(2, 12);		// pow(2, 12)	= 4096
+	output 3, '^', 4, " = ", pow(3, 4);			// pow(3, 4)	= 81
+	output 10, '^', 6, " = ", pow(10, 6);		// pow(10, 6)	= 1000000
+	output 1.1, '^', 5, " = ", pow(1.1, 5);		// pow(1.1, 5)	= 1.61051
+	
+	return 0
+}

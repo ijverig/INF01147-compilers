@@ -1,0 +1,20 @@
+// calcula o módulo de 2 inteiros
+
+int mod(int a, int b) 
+{
+	remainder = a;
+	
+	while (remainder >= b) do 
+		remainder = remainder - b;
+	
+	return remainder
+}
+
+int main()
+{
+	output 9 + 4, " = ", mod(9+4, 12), " (mod 12)";			// mod(9+4, 12)		=> 1
+	output 2345, " = ", mod(2345, 1000), " (mod 1000)";		// mod(2345, 1000)	=> 345
+	output 27 * 3, " = ", mod(27 * 3, 3), " (mod 3)";		// mod(27 * 3, 3)	=> 0
+	
+	return 0
+}

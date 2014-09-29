@@ -1,0 +1,39 @@
+// acha o maior valor numa lista de inteiros não-negativos
+
+int list[100];
+
+int main()
+{
+	int list_size;
+	int i;
+	int n;
+	int biggest;
+	
+	list_size = 100;
+	
+	i = 0;
+	do
+	{
+		input n;
+		
+		list[i] = n;
+		
+		i = i + 1;
+	}
+	while (i < list_size);
+	
+	i = 1;
+	biggest = list[0];
+	do
+	{
+		if (list[i] > biggest)
+		then biggest = list[i];
+		
+		i = i + 1
+	}
+	while (i < list_size);
+	
+	output biggest;
+	
+	return 0
+}
