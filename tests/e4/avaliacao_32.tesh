@@ -1,15 +1,4 @@
 ! timeout 5
 ! output ignore
-$ ./main
-< /* IKS_SUCCESS */
-< int f()
-< {
-<   return 10.3;
-< }
-< 
-< int g()
-< float x;
-< {
-<   return x + f();
-< }
-
+! expect return 1
+$ ./main tests/e4/input/s32.iks
