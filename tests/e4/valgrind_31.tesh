@@ -1,13 +1,3 @@
-! timeout 5
+! timeout 10
 ! output ignore
-$ ./tests/scripts/valgrindtest ./main
-< /* IKS_ERROR_WRONG_PAR_RETURN */
-< char g()
-< {
-<    return 'c';
-< }
-< int f()
-< {
-<    return g();
-< }
-
+$ ./tests/scripts/valgrindtest ./main tests/e4/input/s31.iks
