@@ -16,6 +16,8 @@ extern char *yytext;
 
 comp_tree_t *last_fun_decl;
 
+comp_identifier_item **scope;
+
 %}
 
 %define api.value.type {comp_tree_t *}
@@ -67,6 +69,7 @@ comp_tree_t *last_fun_decl;
 program:
 	%empty
 			{
+					scope = identifier_table_create();
 					$$ = ast = last_fun_decl = make_node(IKS_AST_PROGRAMA, NULL);
 			}
 |	program	glo_decl ';'
@@ -85,17 +88,26 @@ glo_decl:
 var_decl:
 	type TK_IDENTIFICADOR
 			{
+					identifier_table_add(scope, ((comp_identifier_item *) $TK_IDENTIFICADOR)->string);
+
 					$$ = NULL;
 			}
 ;
 
 arr_decl:
 	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
+			{
+					identifier_table_add(scope, ((comp_identifier_item *) $TK_IDENTIFICADOR)->string);
+
+					$$ = NULL;
+			}
 ;
 
 fun_decl:
 	type TK_IDENTIFICADOR '(' params.opt ')' '{' commands '}'
 			{
+					identifier_table_add(scope, ((comp_identifier_item *) $TK_IDENTIFICADOR)->string);
+
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
 					add_child($$, $commands);
 			}
