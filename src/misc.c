@@ -26,5 +26,7 @@ void main_init(int argc, char **argv)
 void main_finalize(void)
 {
 	tree_free(ast);
+	printf("GLOBAL\n");
+	scope_pop();
 	dict_free();
 }

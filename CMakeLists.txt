@@ -18,6 +18,7 @@ ADD_EXECUTABLE(main
   src/comp_list.c
   src/comp_tree.c
   src/comp_identifier_table.c
+  src/comp_scope.c
 )
 TARGET_LINK_LIBRARIES(main ${FLEX_LIBRARIES})
 

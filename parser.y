@@ -16,7 +16,7 @@ extern char *yytext;
 
 comp_tree_t *last_fun_decl;
 
-comp_identifier_item **scope;
+// comp_scope *current_scope is a global from comp_scope.c
 
 %}
 
@@ -69,7 +69,7 @@ comp_identifier_item **scope;
 program:
 	%empty
 			{
-					scope = identifier_table_create();
+					scope_push();
 					$$ = ast = last_fun_decl = make_node(IKS_AST_PROGRAMA, NULL);
 			}
 |	program	glo_decl ';'
@@ -88,7 +88,7 @@ glo_decl:
 var_decl:
 	type TK_IDENTIFICADOR
 			{
-					identifier_table_add(scope, ((comp_identifier_item *) $TK_IDENTIFICADOR)->string);
+					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = NULL;
 			}
@@ -97,16 +97,27 @@ var_decl:
 arr_decl:
 	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
 			{
-					identifier_table_add(scope, ((comp_identifier_item *) $TK_IDENTIFICADOR)->string);
+					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = NULL;
 			}
 ;
 
 fun_decl:
-	type TK_IDENTIFICADOR '(' params.opt ')' '{' commands '}'
+	type TK_IDENTIFICADOR '(' params.opt ')'
+	'{'
 			{
-					identifier_table_add(scope, ((comp_identifier_item *) $TK_IDENTIFICADOR)->string);
+				scope_push();
+			}
+	commands
+			{
+				printf("FUNCTION %s\n", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+
+				scope_pop();
+			}
+	'}'
+			{
+					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
 					add_child($$, $commands);
@@ -124,7 +135,17 @@ params:
 ;
 
 comm_block:
-	'{' commands '}'
+	'{'
+			{
+				scope_push();
+			}
+	commands
+			{
+				printf("BLOCK\n");
+
+				scope_pop();
+			}
+	'}'
 			{
 					$$ = make_node(IKS_AST_BLOCO, NULL);
 					add_child($$, $commands);
