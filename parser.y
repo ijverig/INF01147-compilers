@@ -9,14 +9,19 @@
 
 %{
 
+#include <stdlib.h>
 #include "main.h"
 #include "iks_ast.h"
+#include "semantic_errors.h"
 
 extern char *yytext;
 
 comp_tree_t *last_fun_decl;
 
 // comp_scope *current_scope is a global from comp_scope.c
+
+char is_identifier_declared(char *identifier);
+char _is_identifier_declared(comp_scope *scope, char *identifier);
 
 %}
 
@@ -193,6 +198,13 @@ command:
 attribution:
 	lval '=' expression
 			{
+					// checks if not declared
+					if (!is_identifier_declared($lval->attributes->key))
+					{
+						yyerror("variable \"%s\" is not yet declared", $lval->attributes->key);
+						exit(IKS_ERROR_UNDECLARED);
+					}
+
 					$$ = make_node(IKS_AST_ATRIBUICAO, NULL);
 					add_child($$, $lval);
 					add_child($$, $expression);
@@ -259,6 +271,13 @@ flow_control:
 fun_call:
 	identifier '(' args.opt ')'
 			{
+					// checks if not declared
+					if (!is_identifier_declared($identifier->attributes->key))
+					{
+						yyerror("function \"%s\" is not yet declared", $identifier->attributes->key);
+						exit(IKS_ERROR_UNDECLARED);
+					}
+
 					$$ = make_node(IKS_AST_CHAMADA_DE_FUNCAO, NULL);
 					add_child($$, $identifier);
 					add_child($$, $[args.opt]);
@@ -426,3 +445,26 @@ type:
 ;
 
 %%
+
+// return true if identifier is declared
+char _is_identifier_declared(comp_scope *scope, char *identifier)
+{
+	if (scope == NULL)
+	{
+		return 0;
+	}
+
+	if (identifier_table_get(scope->identifiers, identifier))
+	{
+		return 1;
+	}
+
+	return _is_identifier_declared(scope->previous, identifier);
+}
+
+// wrapper for _is_identifier_declared
+// since current_scope is global, it's not necessary to pass it to the function
+char is_identifier_declared(char *identifier)
+{
+	return _is_identifier_declared(current_scope, identifier);
+}
