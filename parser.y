@@ -20,8 +20,9 @@ comp_tree_t *last_fun_decl;
 
 // comp_scope *current_scope is a global from comp_scope.c
 
-char is_identifier_declared(char *identifier);
 char _is_identifier_declared(comp_scope *scope, char *identifier);
+char is_identifier_declared(char *identifier);
+char is_identifier_declared_in_this_scope(char *identifier);
 
 %}
 
@@ -93,6 +94,13 @@ glo_decl:
 var_decl:
 	type TK_IDENTIFICADOR
 			{
+					// checks if already declared
+					if (is_identifier_declared_in_this_scope(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key))
+					{
+						yyerror("variable \"%s\" is already declared", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+						exit(IKS_ERROR_DECLARED);
+					}
+
 					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = NULL;
@@ -102,6 +110,13 @@ var_decl:
 arr_decl:
 	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
 			{
+					// checks if already declared
+					if (is_identifier_declared_in_this_scope(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key))
+					{
+						yyerror("variable \"%s\" is already declared", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+						exit(IKS_ERROR_DECLARED);
+					}
+					
 					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = NULL;
@@ -122,6 +137,13 @@ fun_decl:
 			}
 	'}'
 			{
+					// checks if already declared
+					if (is_identifier_declared_in_this_scope(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key))
+					{
+						yyerror("function \"%s\" is already declared", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+						exit(IKS_ERROR_DECLARED);
+					}
+
 					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
@@ -467,4 +489,10 @@ char _is_identifier_declared(comp_scope *scope, char *identifier)
 char is_identifier_declared(char *identifier)
 {
 	return _is_identifier_declared(current_scope, identifier);
+}
+
+// return true if identifier is declared in the current scope only
+char is_identifier_declared_in_this_scope(char *identifier)
+{
+	return (long) identifier_table_get(current_scope->identifiers, identifier);
 }
