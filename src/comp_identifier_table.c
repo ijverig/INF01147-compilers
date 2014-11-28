@@ -16,7 +16,7 @@ void identifier_table_print(comp_identifier_item *identifiers[DICT_SIZE])
 		
 		while (item != NULL)
 		{
-			printf("%4d %11p => [%010X] %s\n", index, item, dict_hash(item->string), item->string);
+			printf("%4d %11p => [%010X] %c %s\n", index, item, dict_hash(item->string), item->kind, item->string);
 			
 			item = item->next;
 		}
@@ -56,7 +56,7 @@ comp_identifier_item *identifier_table_get(comp_identifier_item *identifiers[DIC
 	return item;
 }
 
-void identifier_table_add(comp_identifier_item *identifiers[DICT_SIZE], char *string)
+void identifier_table_add(comp_identifier_item *identifiers[DICT_SIZE], char *string, int kind)
 {
 	int index = dict_index(string);
 	
@@ -66,6 +66,8 @@ void identifier_table_add(comp_identifier_item *identifiers[DICT_SIZE], char *st
 	item = (comp_identifier_item *) malloc(sizeof(comp_identifier_item));
 	
 	item->string = string;
+	item->kind = kind;
+	
 	item->next = identifiers[index];
 	
 	identifiers[index] = item;

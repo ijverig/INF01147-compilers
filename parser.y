@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include "main.h"
 #include "iks_ast.h"
-#include "semantic_errors.h"
+#include "semantics.h"
 
 extern char *yytext;
 
@@ -20,7 +20,7 @@ comp_tree_t *last_fun_decl;
 
 // comp_scope *current_scope is a global from comp_scope.c
 
-void declare_identifier(char *identifier);
+void declare_identifier(char *identifier, int kind);
 char _is_identifier_declared(comp_scope *scope, char *identifier);
 char is_identifier_declared(char *identifier);
 char is_identifier_declared_in_this_scope(char *identifier);
@@ -102,7 +102,7 @@ var_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_VARIABLE);
 
 					$$ = NULL;
 			}
@@ -118,7 +118,7 @@ arr_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_ARRAY);
 
 					$$ = NULL;
 			}
@@ -145,7 +145,7 @@ fun_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION);
 
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
 					add_child($$, $commands);
@@ -469,9 +469,9 @@ type:
 
 %%
 
-void declare_identifier(char* identifier)
+void declare_identifier(char* identifier, int kind)
 {
-	identifier_table_add(current_scope->identifiers, identifier);
+	identifier_table_add(current_scope->identifiers, identifier, kind);
 }
 
 // return true if identifier is declared
