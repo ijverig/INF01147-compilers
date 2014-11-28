@@ -14,8 +14,6 @@
 #include "iks_ast.h"
 #include "semantics.h"
 
-extern char *yytext;
-
 comp_tree_t *last_fun_decl;
 
 // comp_scope *current_scope is a global from comp_scope.c
