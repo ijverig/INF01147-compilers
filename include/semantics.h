@@ -5,6 +5,16 @@
 #define IKS_TYPE_STRING	'S'
 #define IKS_TYPE_BOOL	'B'
 
+/* Coerções */
+#define IKS_CAST_NO				0
+#define IKS_CAST_BOOL_TO_INT	1
+#define IKS_CAST_BOOL_TO_FLOAT	2
+#define IKS_CAST_INT_TO_BOOL	4
+#define IKS_CAST_INT_TO_FLOAT	8
+#define IKS_CAST_FLOAT_TO_BOOL	16
+#define IKS_CAST_FLOAT_TO_INT	32
+#define IKS_CAST_YES			64
+
 /* Categoria do identificador */
 #define IKS_KIND_VARIABLE	'V'
 #define IKS_KIND_ARRAY		'A'

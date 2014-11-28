@@ -2,6 +2,7 @@
 #include <string.h>
 #include "main.h"
 #include "iks_ast.h"
+#include "semantics.h"
 
 comp_tree_t *ast;
 
@@ -118,12 +119,13 @@ void tree_print_indented(comp_tree_t *node, int level)
 	}
 }
 
-comp_tree_t *make_typed_node(int kind, int type, comp_dict_item_t *attributes)
+comp_tree_t *make_typed_node(int kind, int type, int casting, comp_dict_item_t *attributes)
 {
 	comp_tree_t *node = (comp_tree_t *) malloc(sizeof(comp_tree_t));
 	
 	node->kind = kind;
 	node->type = type;
+	node->casting = casting;
 	node->attributes = attributes;
 	node->child = node->sibling = NULL;
 	
@@ -134,7 +136,7 @@ comp_tree_t *make_typed_node(int kind, int type, comp_dict_item_t *attributes)
 
 comp_tree_t *make_node(int kind, comp_dict_item_t *attributes)
 {
-	return make_typed_node(kind, -1, attributes);
+	return make_typed_node(kind, -1, IKS_CAST_NO, attributes);
 }
 
 void tree_add_child(comp_tree_t *node, comp_tree_t *child)
