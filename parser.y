@@ -18,7 +18,8 @@ comp_tree_t *last_fun_decl;
 
 // comp_scope *current_scope is a global from comp_scope.c
 
-void declare_identifier(char *identifier, int kind);
+int type2size(int type);
+void declare_identifier(char *identifier, int kind, int type, int size);
 comp_identifier_item *_get_identifier(comp_scope *scope, char *identifier);
 comp_identifier_item *get_identifier(char *identifier);
 char is_identifier_declared(char *identifier);
@@ -101,7 +102,7 @@ var_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_VARIABLE);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_VARIABLE, (long) $type, type2size((long) $type));
 
 					$$ = NULL;
 			}
@@ -117,7 +118,7 @@ arr_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_ARRAY);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_ARRAY, (long) $type, type2size((long) $type) * ((comp_dict_item_t *) $TK_LIT_INT)->symbol.int_value);
 
 					$$ = NULL;
 			}
@@ -144,7 +145,7 @@ fun_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION, (long) $type, 0);
 
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
 					add_child($$, $commands);
@@ -477,17 +478,49 @@ literal:
 
 type:
 	TK_PR_FLOAT
+			{
+					$$ = (comp_tree_t *) IKS_TYPE_FLOAT;
+			}
 |	TK_PR_INT
+			{
+					$$ = (comp_tree_t *) IKS_TYPE_INT;
+			}
 |	TK_PR_CHAR
+			{
+					$$ = (comp_tree_t *) IKS_TYPE_CHAR;
+			}
 |	TK_PR_BOOL
+			{
+					$$ = (comp_tree_t *) IKS_TYPE_BOOL;
+			}
 |	TK_PR_STRING
+			{
+					$$ = (comp_tree_t *) IKS_TYPE_STRING;
+			}
 ;
 
 %%
 
-void declare_identifier(char* identifier, int kind)
+int type2size(int type)
 {
-	identifier_table_add(current_scope->identifiers, identifier, kind);
+	switch (type)
+	{
+		case IKS_TYPE_CHAR:
+		case IKS_TYPE_BOOL:
+			return 1;
+		case IKS_TYPE_INT:
+			return 4;
+		case IKS_TYPE_FLOAT:
+			return 8;
+		// string size should be annotated in attribution, when we know the number of chars
+		case IKS_TYPE_STRING:
+			return -1;
+	}
+}
+
+void declare_identifier(char* identifier, int kind, int type, int size)
+{
+	identifier_table_add(current_scope->identifiers, identifier, kind, type, size);
 }
 
 // returns the identifier or NULL if it is not declared

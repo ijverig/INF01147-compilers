@@ -1,3 +1,10 @@
+/* Tipo de dado do identificador */
+#define IKS_TYPE_INT	'I'
+#define IKS_TYPE_FLOAT	'F'
+#define IKS_TYPE_CHAR	'C'
+#define IKS_TYPE_STRING	'S'
+#define IKS_TYPE_BOOL	'B'
+
 /* Categoria do identificador */
 #define IKS_KIND_VARIABLE	'V'
 #define IKS_KIND_ARRAY		'A'
