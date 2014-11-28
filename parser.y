@@ -102,7 +102,7 @@ var_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_VARIABLE, (long) $type, type2size((long) $type));
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_VARIABLE, $type->type, type2size($type->type));
 
 					$$ = NULL;
 			}
@@ -118,7 +118,7 @@ arr_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_ARRAY, (long) $type, type2size((long) $type) * ((comp_dict_item_t *) $TK_LIT_INT)->symbol.int_value);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_ARRAY, $type->type, type2size($type->type) * ((comp_dict_item_t *) $TK_LIT_INT)->symbol.int_value);
 
 					$$ = NULL;
 			}
@@ -145,7 +145,7 @@ fun_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION, (long) $type, 0);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION, $type->type, 0);
 
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
 					add_child($$, $commands);
@@ -228,9 +228,10 @@ attribution:
 						exit(IKS_ERROR_UNDECLARED);
 					}
 
-					// checks if it is used correctly
-					int right_kind = ($lval->type == IKS_AST_VETOR_INDEXADO) ? IKS_KIND_ARRAY : IKS_KIND_VARIABLE;
 					comp_identifier_item *item = get_identifier($lval->attributes->key);
+
+					// checks if it is used correctly
+					int right_kind = ($lval->kind == IKS_AST_VETOR_INDEXADO) ? IKS_KIND_ARRAY : IKS_KIND_VARIABLE;
 					if (item->kind != right_kind)
 					{
 						yyerror("\"%s\" is not a%s", $lval->attributes->key, (right_kind == IKS_KIND_VARIABLE) ? " variable" : "n array");
@@ -318,7 +319,7 @@ fun_call:
 						exit(IKS_KIND_VARIABLE);
 					}
 
-					$$ = make_node(IKS_AST_CHAMADA_DE_FUNCAO, NULL);
+					$$ = make_typed_node(IKS_AST_CHAMADA_DE_FUNCAO, item->kind, NULL);
 					add_child($$, $identifier);
 					add_child($$, $[args.opt]);
 			}
@@ -349,18 +350,23 @@ expressions:
 expression:
 	literal
 			{
-					$$ = make_node(IKS_AST_LITERAL, (comp_dict_item_t *) $literal);
+					$$ = make_typed_node(IKS_AST_LITERAL, $literal->type, (comp_dict_item_t *) $literal);
 			}
 |	identifier
 			{
-					$$ = $identifier;
+					comp_identifier_item *item = get_identifier($identifier->attributes->key);
+					if (item == NULL) {printf("BOOOOOOOOOOOM!"); exit(1);}
+					$$ = make_typed_node($identifier->kind, item->type, $identifier->attributes);
 			}
 |	array
 			{
-					$$ = $array;
+					comp_identifier_item *item = get_identifier($array->attributes->key);
+					if (item == NULL) {printf("BOOOOOOOOOOOM!"); exit(1);}
+					$$ = make_typed_node($array->kind, item->type, $array->attributes);
 			}
 |	fun_call
 			{
+					// already typed
 					$$ = $fun_call;
 			}
 |	'-' expression[exp]
@@ -469,33 +475,51 @@ array:
 
 literal:
 	TK_LIT_INT
+			{
+					$$ = make_typed_node(-1, IKS_TYPE_INT, (comp_dict_item_t *) $TK_LIT_INT);
+			}
 |	TK_LIT_FLOAT
+			{
+					$$ = make_typed_node(-1, IKS_TYPE_FLOAT, (comp_dict_item_t *) $TK_LIT_FLOAT);
+			}
 |	TK_LIT_CHAR
+			{
+					$$ = make_typed_node(-1, IKS_TYPE_CHAR, (comp_dict_item_t *) $TK_LIT_CHAR);
+			}
 |	TK_LIT_STRING
+			{
+					$$ = make_typed_node(-1, IKS_TYPE_STRING, (comp_dict_item_t *) $TK_LIT_STRING);
+			}
 |	TK_LIT_TRUE
+			{
+					$$ = make_typed_node(-1, IKS_TYPE_BOOL, (comp_dict_item_t *) $TK_LIT_TRUE);
+			}
 |	TK_LIT_FALSE
+			{
+					$$ = make_typed_node(-1, IKS_TYPE_BOOL, (comp_dict_item_t *) $TK_LIT_FALSE);
+			}
 ;
 
 type:
 	TK_PR_FLOAT
 			{
-					$$ = (comp_tree_t *) IKS_TYPE_FLOAT;
+					$$ = make_typed_node(-1, IKS_TYPE_FLOAT, NULL);
 			}
 |	TK_PR_INT
 			{
-					$$ = (comp_tree_t *) IKS_TYPE_INT;
+					$$ = make_typed_node(-1, IKS_TYPE_INT, NULL);
 			}
 |	TK_PR_CHAR
 			{
-					$$ = (comp_tree_t *) IKS_TYPE_CHAR;
+					$$ = make_typed_node(-1, IKS_TYPE_CHAR, NULL);
 			}
 |	TK_PR_BOOL
 			{
-					$$ = (comp_tree_t *) IKS_TYPE_BOOL;
+					$$ = make_typed_node(-1, IKS_TYPE_BOOL, NULL);
 			}
 |	TK_PR_STRING
 			{
-					$$ = (comp_tree_t *) IKS_TYPE_STRING;
+					$$ = make_typed_node(-1, IKS_TYPE_STRING, NULL);
 			}
 ;
 

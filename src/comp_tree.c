@@ -5,9 +5,9 @@
 
 comp_tree_t *ast;
 
-char *iks_type2string(int type)
+char *iks_kind2string(int kind)
 {
-	switch (type)
+	switch (kind)
 	{
 		case (IKS_AST_PROGRAMA):
 			return "program";
@@ -111,24 +111,30 @@ void tree_print_indented(comp_tree_t *node, int level)
 			printf("    ");
 		}
 		
-		printf("%s %s\n", iks_type2string(node->type), (node->type == IKS_AST_IDENTIFICADOR || node->type == IKS_AST_LITERAL || node->type == IKS_AST_FUNCAO) ? node->attributes->key : "");
+		printf("%s %s\n", iks_kind2string(node->kind), (node->kind == IKS_AST_IDENTIFICADOR || node->kind == IKS_AST_LITERAL || node->kind == IKS_AST_FUNCAO) ? node->attributes->key : "");
 		
 		tree_print_indented(node->child, level + 1);
 		tree_print_indented(node->sibling, level);
 	}
 }
 
-comp_tree_t *make_node(int type, comp_dict_item_t *attributes)
+comp_tree_t *make_typed_node(int kind, int type, comp_dict_item_t *attributes)
 {
 	comp_tree_t *node = (comp_tree_t *) malloc(sizeof(comp_tree_t));
 	
+	node->kind = kind;
 	node->type = type;
 	node->attributes = attributes;
 	node->child = node->sibling = NULL;
 	
-	//gv_declare(type, node, (node->type == IKS_AST_IDENTIFICADOR || node->type == IKS_AST_LITERAL || node->type == IKS_AST_FUNCAO) ? node->attributes->key : NULL);
+	//gv_declare(kind, node, (node->kind == IKS_AST_IDENTIFICADOR || node->kind == IKS_AST_LITERAL || node->kind == IKS_AST_FUNCAO) ? node->attributes->key : NULL);
 	
 	return node;
+}
+
+comp_tree_t *make_node(int kind, comp_dict_item_t *attributes)
+{
+	return make_typed_node(kind, -1, attributes);
 }
 
 void tree_add_child(comp_tree_t *node, comp_tree_t *child)
