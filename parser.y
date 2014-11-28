@@ -20,6 +20,7 @@ comp_tree_t *last_fun_decl;
 
 // comp_scope *current_scope is a global from comp_scope.c
 
+void declare_identifier(char *identifier);
 char _is_identifier_declared(comp_scope *scope, char *identifier);
 char is_identifier_declared(char *identifier);
 char is_identifier_declared_in_this_scope(char *identifier);
@@ -101,7 +102,7 @@ var_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = NULL;
 			}
@@ -116,8 +117,8 @@ arr_decl:
 						yyerror("variable \"%s\" is already declared", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 						exit(IKS_ERROR_DECLARED);
 					}
-					
-					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = NULL;
 			}
@@ -144,7 +145,7 @@ fun_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					identifier_table_add(current_scope->identifiers, ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
 					add_child($$, $commands);
@@ -467,6 +468,11 @@ type:
 ;
 
 %%
+
+void declare_identifier(char* identifier)
+{
+	identifier_table_add(current_scope->identifiers, identifier);
+}
 
 // return true if identifier is declared
 char _is_identifier_declared(comp_scope *scope, char *identifier)
