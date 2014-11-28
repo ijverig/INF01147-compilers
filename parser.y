@@ -22,8 +22,12 @@ int type2size(int type);
 void declare_identifier(char *identifier, int kind, int type, int size);
 comp_identifier_item *_get_identifier(comp_scope *scope, char *identifier);
 comp_identifier_item *get_identifier(char *identifier);
-char is_identifier_declared(char *identifier);
-char is_identifier_declared_in_this_scope(char *identifier);
+int is_identifier_declared(char *identifier);
+int is_identifier_declared_in_this_scope(char *identifier);
+int infer_type(int type1, int type2);
+int cast_type(int type1, int type2);
+void char_cannot_be_casted();
+void string_cannot_be_casted();
 
 %}
 
@@ -239,6 +243,9 @@ attribution:
 						exit((item->kind == IKS_KIND_VARIABLE) ? IKS_ERROR_VARIABLE : (item->kind == IKS_KIND_ARRAY) ? IKS_ERROR_VECTOR : IKS_ERROR_FUNCTION);
 					}
 
+					// checks if can cast rval
+					$expression->type = cast_type(item->type, $expression->type);
+
 					// checks type compatibility
 					if (item->type != $expression->type)
 					{
@@ -324,10 +331,10 @@ fun_call:
 					if (item->kind != IKS_KIND_FUNCTION)
 					{
 						yyerror("\"%s\" is not a function", $identifier->attributes->key);
-						exit(IKS_KIND_VARIABLE);
+						exit(IKS_ERROR_VARIABLE);
 					}
 
-					$$ = make_typed_node(IKS_AST_CHAMADA_DE_FUNCAO, item->kind, NULL);
+					$$ = make_typed_node(IKS_AST_CHAMADA_DE_FUNCAO, item->type, NULL);
 					add_child($$, $identifier);
 					add_child($$, $[args.opt]);
 			}
@@ -358,18 +365,16 @@ expressions:
 expression:
 	literal
 			{
-					$$ = make_typed_node(IKS_AST_LITERAL, $literal->type, (comp_dict_item_t *) $literal);
+					$$ = make_typed_node(IKS_AST_LITERAL, $literal->type, (comp_dict_item_t *) $literal->attributes);
 			}
 |	identifier
 			{
 					comp_identifier_item *item = get_identifier($identifier->attributes->key);
-					if (item == NULL) {printf("BOOOOOOOOOOOM!"); exit(1);}
 					$$ = make_typed_node($identifier->kind, item->type, $identifier->attributes);
 			}
 |	array
 			{
 					comp_identifier_item *item = get_identifier($array->attributes->key);
-					if (item == NULL) {printf("BOOOOOOOOOOOM!"); exit(1);}
 					$$ = make_typed_node($array->kind, item->type, $array->attributes);
 			}
 |	fun_call
@@ -379,83 +384,83 @@ expression:
 			}
 |	'-' expression[exp]
 			{
-					$$ = make_node(IKS_AST_ARIM_INVERSAO, NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_INVERSAO, $exp->type, NULL);
 					add_child($$, $exp);
 			}
 |	'!' expression[exp]
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_NEGACAO, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_NEGACAO, $exp->type, NULL);
 					add_child($$, $exp);
 			}
 |	expression[left] '>' expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_G, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_G, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '<' expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_L, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_L, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_EQ expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_IGUAL, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_IGUAL, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_NE expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_DIF, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_DIF, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_GE expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_GE, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_GE, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_LE expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_COMP_LE, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_LE, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_OR expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_OU, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_OU, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_AND expression[right]
 			{
-					$$ = make_node(IKS_AST_LOGICO_E, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_E, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '+' expression[right]
 			{
-					$$ = make_node(IKS_AST_ARIM_SOMA, NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_SOMA, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '-' expression[right]
 			{
-					$$ = make_node(IKS_AST_ARIM_SUBTRACAO, NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_SUBTRACAO, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '*' expression[right]
 			{
-					$$ = make_node(IKS_AST_ARIM_MULTIPLICACAO, NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_MULTIPLICACAO, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '/' expression[right]
 			{
-					$$ = make_node(IKS_AST_ARIM_DIVISAO, NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_DIVISAO, infer_type($left->type, $right->type), NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
@@ -475,6 +480,9 @@ identifier:
 array:
 	identifier '[' expression ']'
 			{
+					// checks if can cast index expression
+					cast_type(IKS_TYPE_INT, $expression->type);
+
 					$$ = make_node(IKS_AST_VETOR_INDEXADO, $identifier->attributes);
 					add_child($$, $identifier);
 					add_child($$, $expression);
@@ -576,14 +584,77 @@ comp_identifier_item *get_identifier(char *identifier)
 }
 
 // returns true if identifier is declared
-// since current_scope is global, it's not necessary to pass it to the function
-char is_identifier_declared(char *identifier)
+int is_identifier_declared(char *identifier)
 {
-	return (long) _get_identifier(current_scope, identifier);
+	return (long) get_identifier(identifier);
 }
 
 // returns true if identifier is declared in the current scope only
-char is_identifier_declared_in_this_scope(char *identifier)
+int is_identifier_declared_in_this_scope(char *identifier)
 {
 	return (long) identifier_table_get(current_scope->identifiers, identifier);
+}
+
+// type inference in expressions
+int infer_type(int type1, int type2)
+{
+	if (type1 == IKS_TYPE_CHAR || type2 == IKS_TYPE_CHAR)
+	{
+		char_cannot_be_casted();
+	}
+
+	if (type1 == IKS_TYPE_STRING || type2 == IKS_TYPE_STRING)
+	{
+		string_cannot_be_casted();
+	}
+
+	if (type1 == IKS_TYPE_FLOAT || type2 == IKS_TYPE_FLOAT)
+	{
+		return IKS_TYPE_FLOAT;
+	}
+
+	if (type1 == IKS_TYPE_INT || type2 == IKS_TYPE_INT)
+	{
+		return IKS_TYPE_INT;
+	}
+
+	return IKS_TYPE_BOOL;
+}
+
+// type casting in attribution
+int cast_type(int type1, int type2)
+{
+	if (type1 == type2)
+	{
+		return type1;
+	}
+
+	if (type2 == IKS_TYPE_CHAR)
+	{
+		char_cannot_be_casted();
+	}
+
+	if (type2 == IKS_TYPE_STRING)
+	{
+		string_cannot_be_casted();
+	}
+
+	if (type1 == IKS_TYPE_CHAR || type1 == IKS_TYPE_STRING)
+	{
+		return type2;
+	}
+
+	return type1;
+}
+
+void char_cannot_be_casted()
+{
+	yyerror("char cannot be casted");
+	exit(IKS_ERROR_CHAR_TO_X);
+}
+
+void string_cannot_be_casted()
+{
+	yyerror("string cannot be casted");
+	exit(IKS_ERROR_STRING_TO_X);
 }
