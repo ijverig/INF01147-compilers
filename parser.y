@@ -128,6 +128,16 @@ fun_decl:
 	type TK_IDENTIFICADOR '(' params.opt ')'
 	'{'
 		{
+			// checks if already declared
+			if (is_identifier_declared_in_this_scope(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key))
+			{
+				yyerror("function \"%s\" is already declared", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+				exit(IKS_ERROR_DECLARED);
+			}
+
+			// declares before reduction to allow recursive calls
+			declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION, $type->type, 0);
+
 			scope_push();
 		}
 	commands
@@ -138,15 +148,6 @@ fun_decl:
 		}
 	'}'
 			{
-					// checks if already declared
-					if (is_identifier_declared_in_this_scope(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key))
-					{
-						yyerror("function \"%s\" is already declared", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
-						exit(IKS_ERROR_DECLARED);
-					}
-
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION, $type->type, 0);
-
 					$$ = make_node(IKS_AST_FUNCAO, (comp_dict_item_t *) $TK_IDENTIFICADOR);
 					add_child($$, $commands);
 			}
@@ -237,7 +238,14 @@ attribution:
 						yyerror("\"%s\" is not a%s", $lval->attributes->key, (right_kind == IKS_KIND_VARIABLE) ? " variable" : "n array");
 						exit((item->kind == IKS_KIND_VARIABLE) ? IKS_ERROR_VARIABLE : (item->kind == IKS_KIND_ARRAY) ? IKS_ERROR_VECTOR : IKS_ERROR_FUNCTION);
 					}
-					
+
+					// checks type compatibility
+					if (item->type != $expression->type)
+					{
+						yyerror("types incompatible (trying to assign %c to %c)", $expression->type, item->type);
+						exit(IKS_ERROR_WRONG_TYPE);
+					}
+
 					$$ = make_node(IKS_AST_ATRIBUICAO, NULL);
 					add_child($$, $lval);
 					add_child($$, $expression);

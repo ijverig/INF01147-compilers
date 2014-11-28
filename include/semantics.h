@@ -20,3 +20,8 @@
 #define IKS_ERROR_VARIABLE			3 //identificador deve ser utilizado como variável
 #define IKS_ERROR_VECTOR			4 //identificador deve ser utilizado como vetor
 #define IKS_ERROR_FUNCTION			5 //identificador deve ser utilizado como função
+
+/* Tipos e tamanho de dados */
+#define IKS_ERROR_WRONG_TYPE		6 //tipos incompatíveis
+#define IKS_ERROR_STRING_TO_X		7 //coerção impossível do tipo string
+#define IKS_ERROR_CHAR_TO_X			8 //coerção impossível do tipo char
