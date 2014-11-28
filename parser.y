@@ -128,15 +128,15 @@ arr_decl:
 fun_decl:
 	type TK_IDENTIFICADOR '(' params.opt ')'
 	'{'
-			{
-				scope_push();
-			}
+		{
+			scope_push();
+		}
 	commands
-			{
-				printf("FUNCTION %s\n", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+		{
+			printf("FUNCTION %s\n", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
 
-				scope_pop();
-			}
+			scope_pop();
+		}
 	'}'
 			{
 					// checks if already declared
@@ -165,15 +165,15 @@ params:
 
 comm_block:
 	'{'
-			{
-				scope_push();
-			}
+		{
+			scope_push();
+		}
 	commands
-			{
-				printf("BLOCK\n");
+		{
+			printf("BLOCK\n");
 
-				scope_pop();
-			}
+			scope_pop();
+		}
 	'}'
 			{
 					$$ = make_node(IKS_AST_BLOCO, NULL);
@@ -492,7 +492,7 @@ void declare_identifier(char* identifier, int kind)
 	identifier_table_add(current_scope->identifiers, identifier, kind);
 }
 
-// return the identifier or NULL if it is not declared
+// returns the identifier or NULL if it is not declared
 comp_identifier_item *_get_identifier(comp_scope *scope, char *identifier)
 {
 	if (scope == NULL)
@@ -512,14 +512,14 @@ comp_identifier_item *get_identifier(char *identifier)
 	return _get_identifier(current_scope, identifier);
 }
 
-// return true if identifier is declared
+// returns true if identifier is declared
 // since current_scope is global, it's not necessary to pass it to the function
 char is_identifier_declared(char *identifier)
 {
 	return (long) _get_identifier(current_scope, identifier);
 }
 
-// return true if identifier is declared in the current scope only
+// returns true if identifier is declared in the current scope only
 char is_identifier_declared_in_this_scope(char *identifier)
 {
 	return (long) identifier_table_get(current_scope->identifiers, identifier);
