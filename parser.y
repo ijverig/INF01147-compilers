@@ -21,7 +21,8 @@ comp_tree_t *last_fun_decl;
 // comp_scope *current_scope is a global from comp_scope.c
 
 void declare_identifier(char *identifier, int kind);
-char _is_identifier_declared(comp_scope *scope, char *identifier);
+comp_identifier_item *_get_identifier(comp_scope *scope, char *identifier);
+comp_identifier_item *get_identifier(char *identifier);
 char is_identifier_declared(char *identifier);
 char is_identifier_declared_in_this_scope(char *identifier);
 
@@ -228,6 +229,15 @@ attribution:
 						exit(IKS_ERROR_UNDECLARED);
 					}
 
+					// checks if it is used correctly
+					int right_kind = ($lval->type == IKS_AST_VETOR_INDEXADO) ? IKS_KIND_ARRAY : IKS_KIND_VARIABLE;
+					comp_identifier_item *item = get_identifier($lval->attributes->key);
+					if (item->kind != right_kind)
+					{
+						yyerror("\"%s\" is not a%s", $lval->attributes->key, (right_kind == IKS_KIND_VARIABLE) ? " variable" : "n array");
+						exit((item->kind == IKS_KIND_VARIABLE) ? IKS_ERROR_VARIABLE : (item->kind == IKS_KIND_ARRAY) ? IKS_ERROR_VECTOR : IKS_ERROR_FUNCTION);
+					}
+					
 					$$ = make_node(IKS_AST_ATRIBUICAO, NULL);
 					add_child($$, $lval);
 					add_child($$, $expression);
@@ -299,6 +309,14 @@ fun_call:
 					{
 						yyerror("function \"%s\" is not yet declared", $identifier->attributes->key);
 						exit(IKS_ERROR_UNDECLARED);
+					}
+
+					// checks if it is used correctly
+					comp_identifier_item *item = get_identifier($identifier->attributes->key);
+					if (item->kind != IKS_KIND_FUNCTION)
+					{
+						yyerror("\"%s\" is not a function", $identifier->attributes->key);
+						exit(IKS_KIND_VARIABLE);
 					}
 
 					$$ = make_node(IKS_AST_CHAMADA_DE_FUNCAO, NULL);
@@ -444,7 +462,7 @@ identifier:
 array:
 	identifier '[' expression ']'
 			{
-					$$ = make_node(IKS_AST_VETOR_INDEXADO, NULL);
+					$$ = make_node(IKS_AST_VETOR_INDEXADO, $identifier->attributes);
 					add_child($$, $identifier);
 					add_child($$, $expression);
 			}
@@ -474,27 +492,31 @@ void declare_identifier(char* identifier, int kind)
 	identifier_table_add(current_scope->identifiers, identifier, kind);
 }
 
-// return true if identifier is declared
-char _is_identifier_declared(comp_scope *scope, char *identifier)
+// return the identifier or NULL if it is not declared
+comp_identifier_item *_get_identifier(comp_scope *scope, char *identifier)
 {
 	if (scope == NULL)
 	{
-		return 0;
+		return NULL;
 	}
 
-	if (identifier_table_get(scope->identifiers, identifier))
-	{
-		return 1;
-	}
-
-	return _is_identifier_declared(scope->previous, identifier);
+	comp_identifier_item *item = identifier_table_get(scope->identifiers, identifier);
+	
+	return (item != NULL) ? item : _get_identifier(scope->previous, identifier);
 }
 
-// wrapper for _is_identifier_declared
+// wrapper for _get_identifier
+// since current_scope is global, it's not necessary to pass it to the function
+comp_identifier_item *get_identifier(char *identifier)
+{
+	return _get_identifier(current_scope, identifier);
+}
+
+// return true if identifier is declared
 // since current_scope is global, it's not necessary to pass it to the function
 char is_identifier_declared(char *identifier)
 {
-	return _is_identifier_declared(current_scope, identifier);
+	return (long) _get_identifier(current_scope, identifier);
 }
 
 // return true if identifier is declared in the current scope only
