@@ -23,3 +23,4 @@ void tree_add_sibling(comp_tree_t *node, comp_tree_t *sibling);
 void add_sibling(comp_tree_t *node, comp_tree_t *sibling);
 
 extern comp_tree_t *ast;
+extern comp_tree_t *retained_nodes_list;

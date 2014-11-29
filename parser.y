@@ -85,6 +85,7 @@ program:
 			{
 					scope_push();
 					$$ = ast = last_fun_decl = make_node(IKS_AST_PROGRAMA, NULL);
+					retained_nodes_list = make_node(-1, NULL);
 			}
 |	program	glo_decl ';'
 |	program	fun_decl
@@ -433,6 +434,9 @@ expression:
 			{
 					comp_identifier_item *item = get_identifier($identifier->attributes->key);
 					$$ = make_typed_node($identifier->kind, item->type, IKS_CAST_NO, $identifier->attributes);
+
+					// since this node is not appended it is never freed
+					free($identifier);
 			}
 |	array
 			{
@@ -555,26 +559,32 @@ literal:
 	TK_LIT_INT
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_INT, IKS_CAST_NO, (comp_dict_item_t *) $TK_LIT_INT);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_LIT_FLOAT
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_FLOAT, IKS_CAST_NO, (comp_dict_item_t *) $TK_LIT_FLOAT);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_LIT_CHAR
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_CHAR, IKS_CAST_NO, (comp_dict_item_t *) $TK_LIT_CHAR);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_LIT_STRING
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_STRING, IKS_CAST_NO, (comp_dict_item_t *) $TK_LIT_STRING);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_LIT_TRUE
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_BOOL, IKS_CAST_NO, (comp_dict_item_t *) $TK_LIT_TRUE);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_LIT_FALSE
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_BOOL, IKS_CAST_NO, (comp_dict_item_t *) $TK_LIT_FALSE);
+					add_child(retained_nodes_list, $$);
 			}
 ;
 
@@ -582,22 +592,27 @@ type:
 	TK_PR_FLOAT
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_FLOAT, IKS_CAST_NO, NULL);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_PR_INT
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_INT, IKS_CAST_NO, NULL);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_PR_CHAR
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_CHAR, IKS_CAST_NO, NULL);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_PR_BOOL
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_BOOL, IKS_CAST_NO, NULL);
+					add_child(retained_nodes_list, $$);
 			}
 |	TK_PR_STRING
 			{
 					$$ = make_typed_node(-1, IKS_TYPE_STRING, IKS_CAST_NO, NULL);
+					add_child(retained_nodes_list, $$);
 			}
 ;
 

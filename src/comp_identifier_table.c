@@ -39,6 +39,8 @@ void identifier_table_free(comp_identifier_item *identifiers[DICT_SIZE])
 			item = item_next;
 		}
 	}
+
+	free(identifiers);
 }
 
 comp_identifier_item *identifier_table_get(comp_identifier_item *identifiers[DICT_SIZE], char *string)
@@ -69,6 +71,8 @@ void identifier_table_add(comp_identifier_item *identifiers[DICT_SIZE], char *st
 	item->kind = kind;
 	item->type = type;
 	item->size = size;
+	item->params = 0;
+	item->params_type = 0;
 	
 	item->next = identifiers[index];
 	

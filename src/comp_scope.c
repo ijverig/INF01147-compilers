@@ -6,6 +6,8 @@ comp_scope *current_scope;
 
 void scope_free()
 {
+	// free(current_scope->identifiers);
+	identifier_table_free(current_scope->identifiers);
 	free(current_scope);
 }
 

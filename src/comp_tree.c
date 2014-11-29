@@ -5,6 +5,7 @@
 #include "semantics.h"
 
 comp_tree_t *ast;
+comp_tree_t *retained_nodes_list;
 
 char *iks_kind2string(int kind)
 {
