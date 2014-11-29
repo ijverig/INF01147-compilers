@@ -17,6 +17,7 @@
 comp_tree_t *last_fun_decl;
 int params;
 int params_type;
+int current_function_return_type;
 
 // comp_scope *current_scope is a global from comp_scope.c
 
@@ -154,6 +155,8 @@ fun_decl:
 			{
 				identifier->params_type = params_type;
 			}
+
+			current_function_return_type = $type->type;
 			
 			scope_push();
 		}
@@ -289,19 +292,35 @@ input:
 					$$ = make_node(IKS_AST_INPUT, NULL);
 					add_child($$, $identifier);
 			}
+|	TK_PR_INPUT TK_LIT_INT
+			{
+					yyerror("wrong input command parameter");
+					exit(IKS_ERROR_WRONG_PAR_INPUT);
+			}
 ;
 
 output:
-	TK_PR_OUTPUT expressions
+	TK_PR_OUTPUT TK_LIT_CHAR
+			{
+					yyerror("wrong output command parameter");
+					exit(IKS_ERROR_WRONG_PAR_OUTPUT);
+			}
+|	TK_PR_OUTPUT TK_LIT_STRING
 			{
 					$$ = make_node(IKS_AST_OUTPUT, NULL);
-					add_child($$, $expressions);
+					add_child($$, $TK_LIT_STRING);
 			}
 ;
 
 return:
 	TK_PR_RETURN expression
 			{
+					if (($expression->type != current_function_return_type) && $expression->type != IKS_TYPE_FLOAT)
+					{
+						yyerror("wrong return command parameter - %c", $expression->type);
+						exit(IKS_ERROR_WRONG_PAR_RETURN);
+					}
+
 					$$ = make_node(IKS_AST_RETURN, NULL);
 					add_child($$, $expression);
 			}

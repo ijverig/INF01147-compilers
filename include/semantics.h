@@ -40,3 +40,8 @@
 #define IKS_ERROR_MISSING_ARGS    9  //faltam argumentos 
 #define IKS_ERROR_EXCESS_ARGS     10 //sobram argumentos 
 #define IKS_ERROR_WRONG_TYPE_ARGS 11 //argumentos incompatíveis
+
+/* Verificação de tipos em comandos */
+#define IKS_ERROR_WRONG_PAR_INPUT  12 //parâmetro não é identificador
+#define IKS_ERROR_WRONG_PAR_OUTPUT 13 //parâmetro não é literal string ou expressão
+#define IKS_ERROR_WRONG_PAR_RETURN 14 //parâmetro não é expressão compatível com tipo do retorno
