@@ -11,6 +11,7 @@
 #include "comp_tree.h"
 #include "comp_identifier_table.h"
 #include "comp_scope.h"
+#include "comp_iloc.h"
 #include "parser.h"
 
 /*
