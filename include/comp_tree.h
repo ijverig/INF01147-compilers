@@ -3,6 +3,8 @@ struct _comp_tree_t
     int kind;
     int type;
     int casting;
+	int params;
+	int params_type;
     struct _comp_dict_item_t *attributes;
     struct _comp_tree_t *sibling;
     struct _comp_tree_t *child;

@@ -4,6 +4,8 @@ struct _comp_identifier_item
     int kind;
     int type;
     int size;
+	int params;
+	int params_type;
     struct _comp_identifier_item *next;
 };
 

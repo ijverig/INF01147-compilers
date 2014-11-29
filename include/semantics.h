@@ -35,3 +35,8 @@
 #define IKS_ERROR_WRONG_TYPE		6 //tipos incompatíveis
 #define IKS_ERROR_STRING_TO_X		7 //coerção impossível do tipo string
 #define IKS_ERROR_CHAR_TO_X			8 //coerção impossível do tipo char
+
+/* Argumentos e parâmetros */
+#define IKS_ERROR_MISSING_ARGS    9  //faltam argumentos 
+#define IKS_ERROR_EXCESS_ARGS     10 //sobram argumentos 
+#define IKS_ERROR_WRONG_TYPE_ARGS 11 //argumentos incompatíveis

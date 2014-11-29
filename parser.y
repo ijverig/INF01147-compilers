@@ -15,6 +15,8 @@
 #include "semantics.h"
 
 comp_tree_t *last_fun_decl;
+int params;
+int params_type;
 
 // comp_scope *current_scope is a global from comp_scope.c
 
@@ -107,6 +109,7 @@ var_decl:
 					}
 
 					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_VARIABLE, $type->type, type2size($type->type));
+					params_type = $type->type;
 
 					$$ = NULL;
 			}
@@ -129,7 +132,11 @@ arr_decl:
 ;
 
 fun_decl:
-	type TK_IDENTIFICADOR '(' params.opt ')'
+	type TK_IDENTIFICADOR '('
+		{
+			params = params_type = 0;
+		}
+	params.opt ')'
 	'{'
 		{
 			// checks if already declared
@@ -141,7 +148,13 @@ fun_decl:
 
 			// declares before reduction to allow recursive calls
 			declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_FUNCTION, $type->type, 0);
-
+			comp_identifier_item *identifier = get_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
+			identifier->params = params;
+			if (params > 0)
+			{
+				identifier->params_type = params_type;
+			}
+			
 			scope_push();
 		}
 	commands
@@ -164,7 +177,13 @@ params.opt:
 
 params:
 	var_decl
+			{
+					++params;
+			}
 |	params ',' var_decl
+			{
+					++params;
+			}
 ;
 
 comm_block:
@@ -317,7 +336,11 @@ flow_control:
 ;
 
 fun_call:
-	identifier '(' args.opt ')'
+	identifier '('
+		{
+			params = params_type = 0;
+		}
+	args.opt ')'
 			{
 					// checks if not declared
 					if (!is_identifier_declared($identifier->attributes->key))
@@ -326,12 +349,30 @@ fun_call:
 						exit(IKS_ERROR_UNDECLARED);
 					}
 
-					// checks if it is used correctly
 					comp_identifier_item *item = get_identifier($identifier->attributes->key);
+
+					// checks if it is used correctly
 					if (item->kind != IKS_KIND_FUNCTION)
 					{
 						yyerror("\"%s\" is not a function", $identifier->attributes->key);
 						exit(IKS_ERROR_VARIABLE);
+					}
+
+					// checks if matchs with declared parameters
+					if (params > item->params)
+					{
+						yyerror("too many arguments to function %s", item->string);
+						exit(IKS_ERROR_EXCESS_ARGS);
+					}
+					else if (params < item->params)
+					{
+						yyerror("too few arguments to function %s", item->string);
+						exit(IKS_ERROR_MISSING_ARGS);
+					}
+					else if (params_type != item->params_type)
+					{
+						yyerror("arguments to function %s do not match", item->string);
+						exit(IKS_ERROR_WRONG_TYPE_ARGS);
 					}
 
 					$$ = make_typed_node(IKS_AST_CHAMADA_DE_FUNCAO, item->type, IKS_CAST_NO, NULL);
@@ -355,10 +396,12 @@ expressions:
 	expression
 			{
 					$$ = $expression;
+					++params;
 			}
 |	expression ',' expressions[expression_next]
 			{
 					add_child($expression, $expression_next);
+					++params;
 			}
 ;
 

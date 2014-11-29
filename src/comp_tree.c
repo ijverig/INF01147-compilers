@@ -126,6 +126,8 @@ comp_tree_t *make_typed_node(int kind, int type, int casting, comp_dict_item_t *
 	node->kind = kind;
 	node->type = type;
 	node->casting = casting;
+	node->params = 0;
+	node->params_type = 0;
 	node->attributes = attributes;
 	node->child = node->sibling = NULL;
 	
