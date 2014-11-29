@@ -118,7 +118,7 @@ var_decl:
 ;
 
 arr_decl:
-	type TK_IDENTIFICADOR '[' TK_LIT_INT ']'
+	type TK_IDENTIFICADOR '[' dimensions ']'
 			{
 					// checks if already declared
 					if (is_identifier_declared_in_this_scope(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key))
@@ -127,10 +127,15 @@ arr_decl:
 						exit(IKS_ERROR_DECLARED);
 					}
 
-					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_ARRAY, $type->type, type2size($type->type) * ((comp_dict_item_t *) $TK_LIT_INT)->symbol.int_value);
+					declare_identifier(((comp_dict_item_t *) $TK_IDENTIFICADOR)->key, IKS_KIND_ARRAY, $type->type, -1/*type2size($type->type) * ((comp_dict_item_t *) $TK_LIT_INT)->symbol.int_value*/);
 
 					$$ = NULL;
 			}
+;
+
+dimensions:
+	TK_LIT_INT
+|	dimensions ',' TK_LIT_INT
 ;
 
 fun_decl:
@@ -232,7 +237,7 @@ command:
 			{
 					$$ = NULL;
 			}
-|	var_decl
+|	glo_decl
 |	attribution
 |	input
 |	output
@@ -540,14 +545,14 @@ identifier:
 ;
 
 array:
-	identifier '[' expression ']'
+	identifier '[' expressions ']'
 			{
 					// checks if can cast index expression
-					cast_type(IKS_TYPE_INT, $expression->type);
+					cast_type(IKS_TYPE_INT, $expressions->type);
 
 					$$ = make_node(IKS_AST_VETOR_INDEXADO, $identifier->attributes);
 					add_child($$, $identifier);
-					add_child($$, $expression);
+					add_child($$, $expressions);
 			}
 ;
 
