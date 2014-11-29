@@ -27,7 +27,6 @@ void main_finalize(void)
 {
 	tree_free(retained_nodes_list);
 	tree_free(ast);
-	printf("GLOBAL\n");
 	scope_pop();
 	dict_free();
 }

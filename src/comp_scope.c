@@ -23,9 +23,6 @@ void scope_push()
 
 void scope_pop()
 {
-	identifier_table_print(current_scope->identifiers);
-	printf("\n");
-
 	comp_scope *previous_scope = current_scope->previous;
 
 	scope_free();

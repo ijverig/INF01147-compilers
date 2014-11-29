@@ -163,8 +163,6 @@ fun_decl:
 		}
 	commands
 		{
-			printf("FUNCTION %s\n", ((comp_dict_item_t *) $TK_IDENTIFICADOR)->key);
-
 			scope_pop();
 		}
 	'}'
@@ -197,8 +195,6 @@ comm_block:
 		}
 	commands
 		{
-			printf("BLOCK\n");
-
 			scope_pop();
 		}
 	'}'
