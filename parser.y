@@ -446,83 +446,83 @@ expression:
 			}
 |	'-' expression[exp]
 			{
-					$$ = make_typed_node(IKS_AST_ARIM_INVERSAO, IKS_CAST_NO, $exp->type, NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_INVERSAO, $exp->type, IKS_CAST_NO, NULL);
 					add_child($$, $exp);
 			}
 |	'!' expression[exp]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_COMP_NEGACAO, IKS_CAST_NO, $exp->type, NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_NEGACAO, $exp->type, IKS_CAST_NO, NULL);
 					add_child($$, $exp);
 			}
 |	expression[left] '>' expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_COMP_G, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_G, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '<' expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_COMP_L, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_L, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_EQ expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_COMP_IGUAL, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_IGUAL, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_NE expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_COMP_DIF, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_DIF, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_GE expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_COMP_GE, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_GE, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_LE expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_COMP_LE, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_COMP_LE, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_OR expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_OU, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_OU, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] TK_OC_AND expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_LOGICO_E, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_LOGICO_E, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '+' expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_ARIM_SOMA, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_SOMA, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '-' expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_ARIM_SUBTRACAO, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_SUBTRACAO, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '*' expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_ARIM_MULTIPLICACAO, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_MULTIPLICACAO, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
 |	expression[left] '/' expression[right]
 			{
-					$$ = make_typed_node(IKS_AST_ARIM_DIVISAO, IKS_CAST_YES, infer_type($left->type, $right->type), NULL);
+					$$ = make_typed_node(IKS_AST_ARIM_DIVISAO, infer_type($left->type, $right->type), IKS_CAST_YES, NULL);
 					add_child($$, $left);
 					add_child($$, $right);
 			}
